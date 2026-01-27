@@ -36,8 +36,23 @@ connectDB().then(() => {
     }, 1000);
 
     // Middleware
+    const allowedOrigins = [
+        process.env.FRONTEND_URL,
+        'http://localhost:3000',
+        'http://localhost:3001'
+    ].filter(Boolean);
+
     app.use(cors({
-        origin: process.env.FRONTEND_URL || 'http://localhost:3000',
+        origin: function (origin, callback) {
+            // Allow requests with no origin (like mobile apps, Postman, etc.)
+            if (!origin) return callback(null, true);
+
+            if (allowedOrigins.indexOf(origin) !== -1 || process.env.NODE_ENV === 'development') {
+                callback(null, true);
+            } else {
+                callback(new Error('Not allowed by CORS'));
+            }
+        },
         credentials: true
     }));
     app.use(express.json());
@@ -92,13 +107,11 @@ connectDB().then(() => {
         // Join a chat room
         socket.on('joinRoom', (chatRoomId) => {
             socket.join(chatRoomId);
-            console.log(`User ${socket.user.name} joined room: ${chatRoomId}`);
         });
 
         // Leave a chat room
         socket.on('leaveRoom', (chatRoomId) => {
             socket.leave(chatRoomId);
-            console.log(`User ${socket.user.name} left room: ${chatRoomId}`);
         });
 
         // Send message
@@ -113,7 +126,6 @@ connectDB().then(() => {
                     message
                 });
             } catch (error) {
-                console.error('Socket send message error:', error);
                 socket.emit('error', { message: 'Failed to send message' });
             }
         });

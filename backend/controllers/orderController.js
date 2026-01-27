@@ -14,12 +14,9 @@ if (process.env.RAZORPAY_KEY_ID && process.env.RAZORPAY_KEY_ID !== 'rzp_test_you
             key_id: process.env.RAZORPAY_KEY_ID,
             key_secret: process.env.RAZORPAY_KEY_SECRET
         });
-        console.log('✅ Razorpay initialized');
     } catch (error) {
-        console.log('⚠️  Razorpay not configured - payment features disabled');
+        // Razorpay initialization failed
     }
-} else {
-    console.log('⚠️  Razorpay keys not set - payment features disabled');
 }
 
 // @route   POST /api/orders/buy-now
@@ -170,7 +167,6 @@ exports.buyNow = async (req, res) => {
             order
         });
     } catch (error) {
-        console.error('Buy now error:', error);
         res.status(500).json({
             success: false,
             message: 'Server error while processing purchase'
@@ -242,7 +238,6 @@ exports.createOrder = async (req, res) => {
             }
         });
     } catch (error) {
-        console.error('Create order error:', error);
         res.status(500).json({
             success: false,
             message: 'Server error while creating order'
@@ -336,7 +331,6 @@ exports.verifyPayment = async (req, res) => {
             order
         });
     } catch (error) {
-        console.error('Verify payment error:', error);
         res.status(500).json({
             success: false,
             message: 'Server error while verifying payment'
@@ -390,7 +384,6 @@ exports.getMyPurchases = async (req, res) => {
             orders: allPurchases
         });
     } catch (error) {
-        console.error('Get purchases error:', error);
         res.status(500).json({
             success: false,
             message: 'Server error while fetching purchases'
@@ -457,7 +450,6 @@ exports.getMySales = async (req, res) => {
             orders: allSales
         });
     } catch (error) {
-        console.error('Get sales error:', error);
         res.status(500).json({
             success: false,
             message: 'Server error while fetching sales'
