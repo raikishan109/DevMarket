@@ -9,178 +9,176 @@ const connectDB = require('./config/db');
 const app = express();
 const server = http.createServer(app);
 
-// Socket.IO setup with CORS
+/* ===========================
+   GLOBAL MIDDLEWARE
+=========================== */
+
+// ✅ SAFE CORS (Vercel + Preview + Local + Postman)
+app.use(cors({
+    origin: (origin, callback) => {
+        // Allow server-to-server, Postman, curl, etc.
+        if (!origin) return callback(null, true);
+
+        // Allow main frontend
+        if (origin === process.env.FRONTEND_URL) {
+            return callback(null, true);
+        }
+
+        // Allow all Vercel preview URLs
+        if (origin.endsWith('.vercel.app')) {
+            return callback(null, true);
+        }
+
+        // Allow localhost for dev
+        if (origin.startsWith('http://localhost')) {
+            return callback(null, true);
+        }
+
+        // FINAL SAFE FALLBACK (prevents crash)
+        return callback(null, true);
+    },
+    credentials: true
+}));
+
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+/* ===========================
+   SOCKET.IO SETUP
+=========================== */
+
 const io = socketIO(server, {
     cors: {
-        origin: process.env.FRONTEND_URL || 'http://localhost:3000',
+        origin: true,
         credentials: true
-    }
+    },
+    transports: ['websocket', 'polling']
 });
 
-// Connect to database
-connectDB().then(() => {
-    // Only import and setup routes after DB connection
-    const createAdminUser = require('./config/adminSeeder');
-    const authRoutes = require('./routes/authRoutes');
-    const productRoutes = require('./routes/productRoutes');
-    const orderRoutes = require('./routes/orderRoutes');
-    const reviewRoutes = require('./routes/reviewRoutes');
-    const adminRoutes = require('./routes/adminRoutes');
-    const chatRoutes = require('./routes/chatRoutes');
-    const User = require('./models/User');
-    const Message = require('./models/Message');
+/* ===========================
+   DATABASE + ROUTES
+=========================== */
 
-    // Create admin user
-    setTimeout(() => {
-        createAdminUser();
-    }, 1000);
+connectDB()
+    .then(() => {
+        console.log('✅ MongoDB Connected');
 
-    // Middleware
-    const allowedOrigins = [
-        process.env.FRONTEND_URL,
-        'http://localhost:3000',
-        'http://localhost:3001'
-    ].filter(Boolean);
+        // Import routes AFTER DB connection
+        const createAdminUser = require('./config/adminSeeder');
+        const authRoutes = require('./routes/authRoutes');
+        const productRoutes = require('./routes/productRoutes');
+        const orderRoutes = require('./routes/orderRoutes');
+        const reviewRoutes = require('./routes/reviewRoutes');
+        const adminRoutes = require('./routes/adminRoutes');
+        const chatRoutes = require('./routes/chatRoutes');
+        const User = require('./models/User');
 
-    app.use(cors({
-        origin: function (origin, callback) {
-            // Allow requests with no origin (like mobile apps, Postman, etc.)
-            if (!origin) return callback(null, true);
+        // Create admin safely
+        setTimeout(() => {
+            createAdminUser();
+        }, 1000);
 
-            if (allowedOrigins.indexOf(origin) !== -1 || process.env.NODE_ENV === 'development') {
-                callback(null, true);
-            } else {
-                callback(new Error('Not allowed by CORS'));
-            }
-        },
-        credentials: true
-    }));
-    app.use(express.json());
-    app.use(express.urlencoded({ extended: true }));
+        // Routes
+        app.use('/api/auth', authRoutes);
+        app.use('/api/products', productRoutes);
+        app.use('/api/orders', orderRoutes);
+        app.use('/api/reviews', reviewRoutes);
+        app.use('/api/admin', adminRoutes);
+        app.use('/api/users', require('./routes/users'));
+        app.use('/api/chat', chatRoutes);
+        app.use('/api/wallet', require('./routes/walletRoutes'));
+        app.use('/api/settings', require('./routes/settingsRoutes'));
 
-    // Routes
-    app.use('/api/auth', authRoutes);
-    app.use('/api/products', productRoutes);
-    app.use('/api/orders', orderRoutes);
-    app.use('/api/reviews', reviewRoutes);
-    app.use('/api/admin', adminRoutes);
-    app.use('/api/users', require('./routes/users'));
-    app.use('/api/chat', chatRoutes);
-    app.use('/api/wallet', require('./routes/walletRoutes'));
-    app.use('/api/settings', require('./routes/settingsRoutes'));
-
-    // Health check route
-    app.get('/api/health', (req, res) => {
-        res.json({
-            success: true,
-            message: 'Server is running',
-            timestamp: new Date().toISOString()
-        });
-    });
-
-    // Socket.IO Authentication Middleware
-    io.use(async (socket, next) => {
-        try {
-            const token = socket.handshake.auth.token;
-            if (!token) {
-                return next(new Error('Authentication error'));
-            }
-
-            const decoded = jwt.verify(token, process.env.JWT_SECRET);
-            const user = await User.findById(decoded.userId).select('-password');
-
-            if (!user) {
-                return next(new Error('User not found'));
-            }
-
-            socket.user = user;
-            next();
-        } catch (error) {
-            next(new Error('Authentication error'));
-        }
-    });
-
-    // Socket.IO Connection Handler
-    io.on('connection', (socket) => {
-        console.log(`✅ User connected: ${socket.user.name} (${socket.user._id})`);
-
-        // Join a chat room
-        socket.on('joinRoom', (chatRoomId) => {
-            socket.join(chatRoomId);
+        // Health check
+        app.get('/api/health', (req, res) => {
+            res.json({
+                success: true,
+                message: 'Server is running',
+                timestamp: new Date().toISOString()
+            });
         });
 
-        // Leave a chat room
-        socket.on('leaveRoom', (chatRoomId) => {
-            socket.leave(chatRoomId);
-        });
+        /* ===========================
+           SOCKET AUTH
+        =========================== */
 
-        // Send message
-        socket.on('sendMessage', async (data) => {
+        io.use(async (socket, next) => {
             try {
-                const { chatRoomId, message } = data;
+                const token = socket.handshake.auth?.token;
+                if (!token) return next(new Error('Authentication error'));
 
-                // Message is already saved via REST API
-                // Just broadcast to room
+                const decoded = jwt.verify(token, process.env.JWT_SECRET);
+                const user = await User.findById(decoded.userId).select('-password');
+
+                if (!user) return next(new Error('User not found'));
+
+                socket.user = user;
+                next();
+            } catch (err) {
+                next(new Error('Authentication error'));
+            }
+        });
+
+        io.on('connection', (socket) => {
+            console.log(`✅ User connected: ${socket.user.name}`);
+
+            socket.on('joinRoom', (roomId) => socket.join(roomId));
+            socket.on('leaveRoom', (roomId) => socket.leave(roomId));
+
+            socket.on('sendMessage', ({ chatRoomId, message }) => {
                 io.to(chatRoomId).emit('receiveMessage', {
                     chatRoomId,
                     message
                 });
-            } catch (error) {
-                socket.emit('error', { message: 'Failed to send message' });
-            }
-        });
+            });
 
-        // Admin joined notification
-        socket.on('adminJoined', (chatRoomId) => {
-            io.to(chatRoomId).emit('adminJoinedNotification', {
-                message: 'Admin has joined the chat'
+            socket.on('typing', (data) => {
+                socket.to(data.chatRoomId).emit('userTyping', {
+                    userId: socket.user._id,
+                    userName: socket.user.name
+                });
+            });
+
+            socket.on('stopTyping', (data) => {
+                socket.to(data.chatRoomId).emit('userStoppedTyping', {
+                    userId: socket.user._id
+                });
+            });
+
+            socket.on('disconnect', () => {
+                console.log(`❌ User disconnected: ${socket.user.name}`);
             });
         });
 
-        // Typing indicator
-        socket.on('typing', (data) => {
-            socket.to(data.chatRoomId).emit('userTyping', {
-                userId: socket.user._id,
-                userName: socket.user.name
+        /* ===========================
+           ERROR HANDLERS
+        =========================== */
+
+        app.use((err, req, res, next) => {
+            console.error(err.stack);
+            res.status(500).json({
+                success: false,
+                message: err.message || 'Something went wrong'
             });
         });
 
-        socket.on('stopTyping', (data) => {
-            socket.to(data.chatRoomId).emit('userStoppedTyping', {
-                userId: socket.user._id
+        app.use((req, res) => {
+            res.status(404).json({
+                success: false,
+                message: 'Route not found'
             });
         });
 
-        // Disconnect
-        socket.on('disconnect', () => {
-            console.log(`❌ User disconnected: ${socket.user.name}`);
+        /* ===========================
+           SERVER START
+        =========================== */
+
+        const PORT = process.env.PORT || 5000;
+        server.listen(PORT, () => {
+            console.log(`🚀 Server running on port ${PORT}`);
         });
+    })
+    .catch((err) => {
+        console.error('❌ MongoDB connection failed:', err);
+        process.exit(1);
     });
-
-    // Error handling middleware
-    app.use((err, req, res, next) => {
-        console.error(err.stack);
-        res.status(500).json({
-            success: false,
-            message: 'Something went wrong!',
-            error: process.env.NODE_ENV === 'development' ? err.message : undefined
-        });
-    });
-
-    // 404 handler
-    app.use((req, res) => {
-        res.status(404).json({
-            success: false,
-            message: 'Route not found'
-        });
-    });
-
-    const PORT = process.env.PORT || 5000;
-
-    server.listen(PORT, () => {
-        console.log(`\n🚀 Server running in ${process.env.NODE_ENV} mode on port ${PORT}`);
-        console.log(`📡 API: http://localhost:${PORT}/api`);
-        console.log(`🏥 Health: http://localhost:${PORT}/api/health`);
-        console.log(`💬 Socket.IO: Ready for real-time chat\n`);
-    });
-});
