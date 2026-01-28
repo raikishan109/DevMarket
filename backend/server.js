@@ -16,26 +16,13 @@ const server = http.createServer(app);
 // ✅ SAFE CORS (Vercel + Preview + Local + Postman)
 app.use(cors({
     origin: (origin, callback) => {
-        // Allow server-to-server, Postman, curl, etc.
         if (!origin) return callback(null, true);
 
-        // Allow main frontend
-        if (origin === process.env.FRONTEND_URL) {
-            return callback(null, true);
-        }
+        if (origin === process.env.FRONTEND_URL) return callback(null, true);
+        if (origin.endsWith('.vercel.app')) return callback(null, true);
+        if (origin.startsWith('http://localhost')) return callback(null, true);
 
-        // Allow all Vercel preview URLs
-        if (origin.endsWith('.vercel.app')) {
-            return callback(null, true);
-        }
-
-        // Allow localhost for dev
-        if (origin.startsWith('http://localhost')) {
-            return callback(null, true);
-        }
-
-        // FINAL SAFE FALLBACK (prevents crash)
-        return callback(null, true);
+        return callback(null, true); // final safe fallback
     },
     credentials: true
 }));
@@ -63,7 +50,6 @@ connectDB()
     .then(() => {
         console.log('✅ MongoDB Connected');
 
-        // Import routes AFTER DB connection
         const createAdminUser = require('./config/adminSeeder');
         const authRoutes = require('./routes/authRoutes');
         const productRoutes = require('./routes/productRoutes');
@@ -78,7 +64,10 @@ connectDB()
             createAdminUser();
         }, 1000);
 
-        // Routes
+        /* ===========================
+           API ROUTES
+        =========================== */
+
         app.use('/api/auth', authRoutes);
         app.use('/api/products', productRoutes);
         app.use('/api/orders', orderRoutes);
@@ -89,7 +78,18 @@ connectDB()
         app.use('/api/wallet', require('./routes/walletRoutes'));
         app.use('/api/settings', require('./routes/settingsRoutes'));
 
-        // Health check
+        /* ===========================
+           ROOT ROUTE (🔥 FIX)
+        =========================== */
+
+        app.get('/', (req, res) => {
+            res.send('Backend is live 🚀');
+        });
+
+        /* ===========================
+           HEALTH CHECK
+        =========================== */
+
         app.get('/api/health', (req, res) => {
             res.json({
                 success: true,
