@@ -285,14 +285,14 @@ export default function AdminDashboard() {
 
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
                 {/* Alert for Reported Chats */}
-                {activeChatRooms.filter(chat => !chat.admin).length > 0 && (
+                {activeChatRooms.filter(chat => chat.adminRequested && !chat.admin).length > 0 && (
                     <div className="mb-6 bg-red-50 border-l-4 border-red-500 p-4 rounded-lg animate-pulse">
                         <div className="flex items-center justify-between">
                             <div className="flex items-center space-x-3">
                                 <span className="text-3xl">🚨</span>
                                 <div>
                                     <h3 className="text-red-800 font-bold text-lg">
-                                        {activeChatRooms.filter(chat => !chat.admin).length} Chat(s) Need Admin Attention!
+                                        {activeChatRooms.filter(chat => chat.adminRequested && !chat.admin).length} Chat(s) Need Admin Attention!
                                     </h3>
                                     <p className="text-red-600 text-sm">
                                         Users have requested admin help. Click "Reported Chats" tab to view.
