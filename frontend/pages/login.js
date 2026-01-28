@@ -35,7 +35,7 @@ export default function Login() {
         setLoading(true);
 
         try {
-            const response = await api.post('/auth/login', formData);
+            const response = await api.post('/api/auth/login', formData);
 
             if (response.data.success) {
                 setAuth(response.data.token, response.data.user);
