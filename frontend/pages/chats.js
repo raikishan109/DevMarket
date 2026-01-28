@@ -25,7 +25,7 @@ export default function ChatList() {
 
     const fetchChatRooms = async () => {
         try {
-            const response = await api.get('/chat/rooms');
+            const response = await api.get('/api/chat/rooms');
             if (response.data.success) {
                 setChatRooms(response.data.chatRooms);
             }
