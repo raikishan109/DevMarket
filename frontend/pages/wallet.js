@@ -188,24 +188,24 @@ export default function Wallet() {
             </div>
 
             <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-                <div className="bg-gradient-to-br from-green-500 to-teal-500 rounded-xl shadow-xl p-5 mb-8 text-white">
-                    <div className="flex items-center justify-between mb-4">
+                <div className="bg-gradient-to-br from-green-500 to-teal-500 rounded-2xl shadow-2xl p-8 mb-8 text-white">
+                    <div className="flex items-center justify-between mb-6">
                         <div className="flex-1">
-                            <p className="text-green-100 mb-1 text-sm">Total Balance</p>
-                            <h2 className="text-3xl font-bold mb-3">₹{balance.toLocaleString()}</h2>
-                            <div className={`grid ${user?.role === 'admin' ? 'grid-cols-3' : 'grid-cols-2'} gap-3 mt-3`}>
-                                <div className="bg-white/10 rounded-lg p-2">
-                                    <p className="text-green-100 text-xs mb-1">Total Earnings</p>
-                                    <p className="text-lg font-bold">
+                            <p className="text-green-100 mb-2">Total Balance</p>
+                            <h2 className="text-5xl font-bold mb-4">₹{balance.toLocaleString()}</h2>
+                            <div className={`grid ${user?.role === 'admin' ? 'grid-cols-3' : 'grid-cols-2'} gap-4 mt-4`}>
+                                <div className="bg-white/10 rounded-lg p-3">
+                                    <p className="text-green-100 text-sm mb-1">Total Earnings</p>
+                                    <p className="text-2xl font-bold">
                                         ₹{transactions
                                             .filter(t => t.type === 'credit' && t.category === 'sale')
                                             .reduce((sum, t) => sum + t.amount, 0)
                                             .toLocaleString()}
                                     </p>
                                 </div>
-                                <div className="bg-white/10 rounded-lg p-2">
-                                    <p className="text-green-100 text-xs mb-1">Total Spent</p>
-                                    <p className="text-lg font-bold">
+                                <div className="bg-white/10 rounded-lg p-3">
+                                    <p className="text-green-100 text-sm mb-1">Total Spent</p>
+                                    <p className="text-2xl font-bold">
                                         ₹{transactions
                                             .filter(t => t.type === 'debit')
                                             .reduce((sum, t) => sum + t.amount, 0)
@@ -213,29 +213,29 @@ export default function Wallet() {
                                     </p>
                                 </div>
                                 {user?.role === 'admin' && (
-                                    <div className="bg-white/10 rounded-lg p-2">
-                                        <p className="text-green-100 text-xs mb-1">Platform Income</p>
-                                        <p className="text-lg font-bold">
+                                    <div className="bg-white/10 rounded-lg p-3">
+                                        <p className="text-green-100 text-sm mb-1">Platform Income</p>
+                                        <p className="text-2xl font-bold">
                                             ₹{platformEarnings.toLocaleString()}
                                         </p>
                                     </div>
                                 )}
                             </div>
                         </div>
-                        <div className="w-14 h-14 bg-white/20 rounded-full flex items-center justify-center ml-3">
-                            <FiDollarSign className="text-3xl" />
+                        <div className="w-20 h-20 bg-white/20 rounded-full flex items-center justify-center ml-4">
+                            <FiDollarSign className="text-5xl" />
                         </div>
                     </div>
-                    <div className="flex gap-3">
+                    <div className="flex gap-4">
                         <button
                             onClick={() => setShowAddMoney(true)}
-                            className="flex-1 bg-white text-green-600 px-4 py-2 rounded-lg font-semibold hover:bg-green-50 transition-colors text-sm"
+                            className="flex-1 bg-white text-green-600 px-6 py-3 rounded-lg font-semibold hover:bg-green-50 transition-colors"
                         >
                             Add Money
                         </button>
                         <button
                             onClick={() => setShowWithdraw(true)}
-                            className="flex-1 bg-white/20 hover:bg-white/30 px-4 py-2 rounded-lg font-semibold transition-colors text-sm"
+                            className="flex-1 bg-white/20 hover:bg-white/30 px-6 py-3 rounded-lg font-semibold transition-colors"
                         >
                             Withdraw
                         </button>
