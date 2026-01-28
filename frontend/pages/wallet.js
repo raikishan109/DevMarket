@@ -50,11 +50,19 @@ export default function Wallet() {
         setUser(currentUser);
         fetchWallet();
         fetchPaymentSettings();
+
+        // Auto-refresh wallet balance every 10 seconds
+        const refreshInterval = setInterval(() => {
+            fetchWallet();
+        }, 10000); // 10 seconds
+
+        // Cleanup interval on component unmount
+        return () => clearInterval(refreshInterval);
     }, []);
 
     const fetchWallet = async () => {
         try {
-            const response = await api.get('/wallet');
+            const response = await api.get('/api/wallet');
             if (response.data.success) {
                 setBalance(response.data.balance);
                 setTransactions(response.data.transactions);
@@ -68,7 +76,7 @@ export default function Wallet() {
 
     const fetchPaymentSettings = async () => {
         try {
-            const response = await api.get('/settings/payment-options');
+            const response = await api.get('/api/settings/payment-options');
             if (response.data.success) {
                 setPaymentSettings({
                     cryptoAddresses: response.data.cryptoAddresses || [],
@@ -98,7 +106,7 @@ export default function Wallet() {
                 payload.utrNumber = utrNumber;
             }
 
-            const response = await api.post('/wallet/payment', payload);
+            const response = await api.post('/api/wallet/payment', payload);
             if (response.data.success) {
                 alert(response.data.message);
                 setAmount('');
@@ -135,7 +143,7 @@ export default function Wallet() {
                 payload.upiId = upiId;
             }
 
-            const response = await api.post('/wallet/withdrawal', payload);
+            const response = await api.post('/api/wallet/withdrawal', payload);
             if (response.data.success) {
                 alert(response.data.message);
                 setAmount('');
