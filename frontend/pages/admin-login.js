@@ -28,7 +28,7 @@ export default function AdminLogin() {
         setLoading(true);
 
         try {
-            const response = await api.post('/auth/admin-login', formData);
+            const response = await api.post('/api/auth/admin-login', formData);
 
             if (response.data.success) {
                 const { token, user } = response.data;
