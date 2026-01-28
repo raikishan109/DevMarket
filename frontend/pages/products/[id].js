@@ -34,14 +34,14 @@ export default function ProductDetail() {
 
     const fetchProduct = async () => {
         try {
-            const response = await api.get(`/products/${id}`);
+            const response = await api.get(`/api/products/${id}`);
             if (response.data.success) {
                 setProduct(response.data.product);
                 setReviews(response.data.reviews || []);
 
                 // Check if user has purchased
                 if (user) {
-                    const purchasesResponse = await api.get('/orders/my-purchases');
+                    const purchasesResponse = await api.get('/api/orders/my-purchases');
                     const purchased = purchasesResponse.data.orders?.some(
                         order => order.product._id === id
                     );
@@ -63,7 +63,7 @@ export default function ProductDetail() {
 
         try {
             // Fetch current wallet balance
-            const walletRes = await api.get('/wallet');
+            const walletRes = await api.get('/api/wallet');
             const currentBalance = walletRes.data.wallet.balance;
             const remainingBalance = currentBalance - product.price;
 
@@ -86,7 +86,7 @@ export default function ProductDetail() {
             toast.info('Processing payment...');
 
             // Process payment
-            const response = await api.post('/orders/buy-now', {
+            const response = await api.post('/api/orders/buy-now', {
                 productId: product._id
             });
 
@@ -114,7 +114,7 @@ export default function ProductDetail() {
         }
 
         try {
-            const chatResponse = await api.post('/chat/create', {
+            const chatResponse = await api.post('/api/chat/create', {
                 productId: product._id
             });
 
@@ -133,7 +133,7 @@ export default function ProductDetail() {
     const handleReviewSubmit = async (e) => {
         e.preventDefault();
         try {
-            await api.post('/reviews', {
+            await api.post('/api/reviews', {
                 productId: product._id,
                 rating: reviewForm.rating,
                 comment: reviewForm.comment
