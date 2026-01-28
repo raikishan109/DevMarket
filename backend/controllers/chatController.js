@@ -519,12 +519,24 @@ exports.markDealAsDone = async (req, res) => {
         await chatRoom.save();
 
         // Create system message
-        await Message.create({
+        const systemMessage = await Message.create({
             chatRoom: chatRoom._id,
             sender: req.user._id,
             senderRole: 'seller',
             message: '✅ Seller has marked the deal as done. Waiting for buyer confirmation.'
         });
+
+        // Populate sender for Socket.IO emit
+        await systemMessage.populate('sender', 'name email');
+
+        // Emit Socket.IO event to notify buyer in real-time
+        const io = req.app.get('io');
+        if (io) {
+            io.to(chatRoom._id.toString()).emit('receiveMessage', {
+                chatRoomId: chatRoom._id.toString(),
+                message: systemMessage
+            });
+        }
 
         res.json({
             success: true,
@@ -684,12 +696,24 @@ exports.confirmDeal = async (req, res) => {
         await chatRoom.save();
 
         // Create system message
-        await Message.create({
+        const systemMessage = await Message.create({
             chatRoom: chatRoom._id,
             sender: req.user._id,
             senderRole: 'buyer',
             message: '🎉 Deal completed! Sale has been recorded. Chat has been closed.'
         });
+
+        // Populate sender for Socket.IO emit
+        await systemMessage.populate('sender', 'name email');
+
+        // Emit Socket.IO event to notify all participants
+        const io = req.app.get('io');
+        if (io) {
+            io.to(chatRoom._id.toString()).emit('receiveMessage', {
+                chatRoomId: chatRoom._id.toString(),
+                message: systemMessage
+            });
+        }
 
         res.json({
             success: true,
