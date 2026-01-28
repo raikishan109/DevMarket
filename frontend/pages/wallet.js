@@ -10,6 +10,7 @@ export default function Wallet() {
     const router = useRouter();
     const [user, setUser] = useState(null);
     const [balance, setBalance] = useState(0);
+    const [platformEarnings, setPlatformEarnings] = useState(0);
     const [transactions, setTransactions] = useState([]);
     const [loading, setLoading] = useState(true);
     const [showAddMoney, setShowAddMoney] = useState(false);
@@ -65,6 +66,7 @@ export default function Wallet() {
             const response = await api.get('/api/wallet');
             if (response.data.success) {
                 setBalance(response.data.balance);
+                setPlatformEarnings(response.data.platformEarnings || 0);
                 setTransactions(response.data.transactions);
             }
         } catch (error) {
@@ -191,7 +193,7 @@ export default function Wallet() {
                         <div className="flex-1">
                             <p className="text-green-100 mb-2">Total Balance</p>
                             <h2 className="text-5xl font-bold mb-4">₹{balance.toLocaleString()}</h2>
-                            <div className="grid grid-cols-2 gap-4 mt-4">
+                            <div className={`grid ${user?.role === 'admin' ? 'grid-cols-3' : 'grid-cols-2'} gap-4 mt-4`}>
                                 <div className="bg-white/10 rounded-lg p-3">
                                     <p className="text-green-100 text-sm mb-1">Total Earnings</p>
                                     <p className="text-2xl font-bold">
@@ -210,6 +212,14 @@ export default function Wallet() {
                                             .toLocaleString()}
                                     </p>
                                 </div>
+                                {user?.role === 'admin' && (
+                                    <div className="bg-white/10 rounded-lg p-3">
+                                        <p className="text-green-100 text-sm mb-1">Platform Income</p>
+                                        <p className="text-2xl font-bold">
+                                            ₹{platformEarnings.toLocaleString()}
+                                        </p>
+                                    </div>
+                                )}
                             </div>
                         </div>
                         <div className="w-20 h-20 bg-white/20 rounded-full flex items-center justify-center ml-4">
