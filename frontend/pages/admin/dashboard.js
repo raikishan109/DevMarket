@@ -21,6 +21,8 @@ export default function AdminDashboard() {
     const [users, setUsers] = useState([]);
     const [pendingPayments, setPendingPayments] = useState([]);
     const [pendingWithdrawals, setPendingWithdrawals] = useState([]);
+    const [allPayments, setAllPayments] = useState([]);
+    const [allWithdrawals, setAllWithdrawals] = useState([]);
     const [settings, setSettings] = useState({ platformCommission: 10 });
     const [activeTab, setActiveTab] = useState('overview');
     const [loading, setLoading] = useState(true);
@@ -48,7 +50,9 @@ export default function AdminDashboard() {
                 api.get('/api/chat/admin/all'),
                 api.get('/api/admin/users'),
                 api.get('/api/admin/payments/pending'),
-                api.get('/api/admin/withdrawals/pending')
+                api.get('/api/admin/withdrawals/pending'),
+                api.get('/api/admin/payments'),
+                api.get('/api/admin/withdrawals')
             ];
 
             // Only fetch sub-admins if user is main admin
@@ -57,7 +61,7 @@ export default function AdminDashboard() {
             }
 
             const results = await Promise.all(promises);
-            const [statsRes, pendingRes, approvedRes, devsRes, settingsRes, chatsRes, usersRes, paymentsRes, withdrawalsRes, subAdminsRes] = results;
+            const [statsRes, pendingRes, approvedRes, devsRes, settingsRes, chatsRes, usersRes, paymentsRes, withdrawalsRes, allPaymentsRes, allWithdrawalsRes, subAdminsRes] = results;
 
             if (statsRes.data.success) setStats(statsRes.data.stats);
             if (pendingRes.data.success) setPendingProducts(pendingRes.data.products);
@@ -68,6 +72,8 @@ export default function AdminDashboard() {
             if (usersRes.data.success) setUsers(usersRes.data.users);
             if (paymentsRes.data.success) setPendingPayments(paymentsRes.data.payments);
             if (withdrawalsRes.data.success) setPendingWithdrawals(withdrawalsRes.data.withdrawals);
+            if (allPaymentsRes.data.success) setAllPayments(allPaymentsRes.data.payments);
+            if (allWithdrawalsRes.data.success) setAllWithdrawals(allWithdrawalsRes.data.withdrawals);
             if (subAdminsRes?.data.success) setSubAdmins(subAdminsRes.data.subAdmins);
         } catch (error) {
             console.error('Error fetching data:', error);
@@ -1084,42 +1090,46 @@ export default function AdminDashboard() {
 
                                 {/* Payment History */}
                                 <div className="card">
-                                    <h2 className="text-xl font-bold mb-4">📜 Recent Payment History</h2>
-                                    <div className="overflow-x-auto">
-                                        <table className="min-w-full divide-y divide-gray-200">
-                                            <thead className="bg-gray-50">
-                                                <tr>
-                                                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">User</th>
-                                                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Amount</th>
-                                                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Type</th>
-                                                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
-                                                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Date</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody className="bg-white divide-y divide-gray-200">
-                                                {pendingPayments.slice(0, 10).map((payment) => (
-                                                    <tr key={payment._id}>
-                                                        <td className="px-4 py-3 text-sm">{payment.user?.name}</td>
-                                                        <td className="px-4 py-3 text-sm font-semibold">₹{payment.amount}</td>
-                                                        <td className="px-4 py-3 text-sm">{payment.paymentType === 'crypto' ? 'Crypto' : 'UPI'}</td>
-                                                        <td className="px-4 py-3">
-                                                            <span className={`badge ${payment.status === 'approved' ? 'badge-success' :
-                                                                payment.status === 'rejected' ? 'badge-danger' :
-                                                                    'badge-warning'
-                                                                }`}>
-                                                                {payment.status === 'approved' ? '✓ Approved' :
-                                                                    payment.status === 'rejected' ? '✗ Rejected' :
-                                                                        '⏳ Pending'}
-                                                            </span>
-                                                        </td>
-                                                        <td className="px-4 py-3 text-sm text-gray-500">
-                                                            {new Date(payment.createdAt).toLocaleDateString()}
-                                                        </td>
+                                    <h2 className="text-xl font-bold mb-4">📜 Payment History (Recent {allPayments.length > 20 ? '20' : allPayments.length})</h2>
+                                    {allPayments.length > 0 ? (
+                                        <div className="overflow-x-auto">
+                                            <table className="min-w-full divide-y divide-gray-200">
+                                                <thead className="bg-gray-50">
+                                                    <tr>
+                                                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">User</th>
+                                                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Amount</th>
+                                                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Type</th>
+                                                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
+                                                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Date</th>
                                                     </tr>
-                                                ))}
-                                            </tbody>
-                                        </table>
-                                    </div>
+                                                </thead>
+                                                <tbody className="bg-white divide-y divide-gray-200">
+                                                    {allPayments.slice(0, 20).map((payment) => (
+                                                        <tr key={payment._id}>
+                                                            <td className="px-4 py-3 text-sm">{payment.user?.name}</td>
+                                                            <td className="px-4 py-3 text-sm font-semibold">₹{payment.amount}</td>
+                                                            <td className="px-4 py-3 text-sm">{payment.paymentType === 'crypto' ? 'Crypto' : 'UPI'}</td>
+                                                            <td className="px-4 py-3">
+                                                                <span className={`badge ${payment.status === 'approved' ? 'badge-success' :
+                                                                    payment.status === 'rejected' ? 'badge-danger' :
+                                                                        'badge-warning'
+                                                                    }`}>
+                                                                    {payment.status === 'approved' ? '✓ Approved' :
+                                                                        payment.status === 'rejected' ? '✗ Rejected' :
+                                                                            '⏳ Pending'}
+                                                                </span>
+                                                            </td>
+                                                            <td className="px-4 py-3 text-sm text-gray-500">
+                                                                {new Date(payment.createdAt).toLocaleDateString()}
+                                                            </td>
+                                                        </tr>
+                                                    ))}
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    ) : (
+                                        <p className="text-center py-8 text-gray-500">No payment history yet</p>
+                                    )}
                                 </div>
                             </div>
                         )}
@@ -1208,42 +1218,46 @@ export default function AdminDashboard() {
 
                                 {/* Withdrawal History */}
                                 <div className="card">
-                                    <h2 className="text-xl font-bold mb-4">📜 Recent Withdrawal History</h2>
-                                    <div className="overflow-x-auto">
-                                        <table className="min-w-full divide-y divide-gray-200">
-                                            <thead className="bg-gray-50">
-                                                <tr>
-                                                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">User</th>
-                                                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Amount</th>
-                                                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Type</th>
-                                                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
-                                                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Date</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody className="bg-white divide-y divide-gray-200">
-                                                {pendingWithdrawals.slice(0, 10).map((withdrawal) => (
-                                                    <tr key={withdrawal._id}>
-                                                        <td className="px-4 py-3 text-sm">{withdrawal.user?.name}</td>
-                                                        <td className="px-4 py-3 text-sm font-semibold text-red-600">-₹{withdrawal.amount}</td>
-                                                        <td className="px-4 py-3 text-sm">{withdrawal.withdrawalType === 'crypto' ? 'Crypto' : 'UPI'}</td>
-                                                        <td className="px-4 py-3">
-                                                            <span className={`badge ${withdrawal.status === 'completed' ? 'badge-success' :
+                                    <h2 className="text-xl font-bold mb-4">📜 Withdrawal History (Recent {allWithdrawals.length > 20 ? '20' : allWithdrawals.length})</h2>
+                                    {allWithdrawals.length > 0 ? (
+                                        <div className="overflow-x-auto">
+                                            <table className="min-w-full divide-y divide-gray-200">
+                                                <thead className="bg-gray-50">
+                                                    <tr>
+                                                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">User</th>
+                                                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Amount</th>
+                                                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Type</th>
+                                                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
+                                                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Date</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody className="bg-white divide-y divide-gray-200">
+                                                    {allWithdrawals.slice(0, 20).map((withdrawal) => (
+                                                        <tr key={withdrawal._id}>
+                                                            <td className="px-4 py-3 text-sm">{withdrawal.user?.name}</td>
+                                                            <td className="px-4 py-3 text-sm font-semibold text-red-600">-₹{withdrawal.amount}</td>
+                                                            <td className="px-4 py-3 text-sm">{withdrawal.withdrawalType === 'crypto' ? 'Crypto' : 'UPI'}</td>
+                                                            <td className="px-4 py-3">
+                                                                <span className={`badge ${withdrawal.status === 'completed' ? 'badge-success' :
                                                                     withdrawal.status === 'failed' ? 'badge-danger' :
                                                                         'badge-warning'
-                                                                }`}>
-                                                                {withdrawal.status === 'completed' ? '✓ Approved' :
-                                                                    withdrawal.status === 'failed' ? '✗ Rejected' :
-                                                                        '⏳ Pending'}
-                                                            </span>
-                                                        </td>
-                                                        <td className="px-4 py-3 text-sm text-gray-500">
-                                                            {new Date(withdrawal.createdAt).toLocaleDateString()}
-                                                        </td>
-                                                    </tr>
-                                                ))}
-                                            </tbody>
-                                        </table>
-                                    </div>
+                                                                    }`}>
+                                                                    {withdrawal.status === 'completed' ? '✓ Approved' :
+                                                                        withdrawal.status === 'failed' ? '✗ Rejected' :
+                                                                            '⏳ Pending'}
+                                                                </span>
+                                                            </td>
+                                                            <td className="px-4 py-3 text-sm text-gray-500">
+                                                                {new Date(withdrawal.createdAt).toLocaleDateString()}
+                                                            </td>
+                                                        </tr>
+                                                    ))}
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    ) : (
+                                        <p className="text-center py-8 text-gray-500">No withdrawal history yet</p>
+                                    )}
                                 </div>
                             </div>
                         )}
