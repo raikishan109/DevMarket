@@ -38,18 +38,18 @@ export default function AdminDashboard() {
         try {
             const currentUser = getUser();
             const promises = [
-                api.get('/admin/stats'),
-                api.get('/admin/products/pending'),
-                api.get('/admin/products/approved'),
-                api.get('/admin/developers'),
-                api.get('/admin/settings'),
-                api.get('/chat/admin/all'),
-                api.get('/admin/users')
+                api.get('/api/admin/stats'),
+                api.get('/api/admin/products/pending'),
+                api.get('/api/admin/products/approved'),
+                api.get('/api/admin/developers'),
+                api.get('/api/admin/settings'),
+                api.get('/api/chat/admin/all'),
+                api.get('/api/admin/users')
             ];
 
             // Only fetch sub-admins if user is main admin
             if (currentUser && !currentUser.isSubAdmin) {
-                promises.push(api.get('/admin/sub-admins'));
+                promises.push(api.get('/api/admin/sub-admins'));
             }
 
             const results = await Promise.all(promises);
@@ -72,7 +72,7 @@ export default function AdminDashboard() {
 
     const handleApproveProduct = async (id) => {
         try {
-            await api.put(`/admin/products/${id}/approve`);
+            await api.put(`/api/admin/products/${id}/approve`);
             toast.success('Product approved successfully');
             fetchData();
         } catch (error) {
@@ -85,7 +85,7 @@ export default function AdminDashboard() {
         if (!reason) return;
 
         try {
-            await api.put(`/admin/products/${id}/reject`, { reason });
+            await api.put(`/api/admin/products/${id}/reject`, { reason });
             toast.success('Product rejected');
             fetchData();
         } catch (error) {
@@ -98,7 +98,7 @@ export default function AdminDashboard() {
         if (!confirmed) return;
 
         try {
-            await api.put(`/admin/products/${id}/remove`);
+            await api.put(`/api/admin/products/${id}/remove`);
             toast.success('Product removed from marketplace');
             fetchData();
         } catch (error) {
@@ -111,7 +111,7 @@ export default function AdminDashboard() {
         if (!confirmed) return;
 
         try {
-            await api.delete(`/admin/products/${id}/permanent`);
+            await api.delete(`/api/admin/products/${id}/permanent`);
             toast.success('Product permanently deleted');
             fetchData();
         } catch (error) {
@@ -123,10 +123,10 @@ export default function AdminDashboard() {
     const handleVerifyDeveloper = async (id, verify) => {
         try {
             if (verify) {
-                await api.put(`/admin/developers/${id}/verify`);
+                await api.put(`/api/admin/developers/${id}/verify`);
                 toast.success('Developer verified');
             } else {
-                await api.put(`/admin/developers/${id}/unverify`);
+                await api.put(`/api/admin/developers/${id}/unverify`);
                 toast.success('Developer unverified');
             }
             fetchData();
@@ -138,11 +138,11 @@ export default function AdminDashboard() {
     const handleUpdateSettings = async (e) => {
         e.preventDefault();
         try {
-            const response = await api.put('/admin/settings', { platformCommission: settings.platformCommission });
+            const response = await api.put('/api/admin/settings', { platformCommission: settings.platformCommission });
             if (response.data.success) {
                 toast.success('Settings updated successfully! 🎉');
                 // Refresh settings to show the updated value
-                const settingsRes = await api.get('/admin/settings');
+                const settingsRes = await api.get('/api/admin/settings');
                 if (settingsRes.data.success) {
                     setSettings(settingsRes.data.settings);
                 }
@@ -155,7 +155,7 @@ export default function AdminDashboard() {
     const handleCreateSubAdmin = async (e) => {
         e.preventDefault();
         try {
-            const res = await api.post('/admin/sub-admins', newSubAdmin);
+            const res = await api.post('/api/admin/sub-admins', newSubAdmin);
             if (res.data.success) {
                 toast.success('Sub-admin created successfully');
                 setNewSubAdmin({ name: '', email: '', password: '' });
@@ -170,7 +170,7 @@ export default function AdminDashboard() {
         const confirmed = await toast.confirm('Are you sure you want to delete this sub-admin? This action cannot be undone.');
         if (!confirmed) return;
         try {
-            await api.delete(`/admin/sub-admins/${id}`);
+            await api.delete(`/api/admin/sub-admins/${id}`);
             toast.success('Sub-admin deleted successfully');
             fetchData();
         } catch (error) {
@@ -182,7 +182,7 @@ export default function AdminDashboard() {
         const confirmed = await toast.confirm('Are you sure you want to delete this user? This will also delete all their data.');
         if (!confirmed) return;
         try {
-            await api.delete(`/admin/users/${id}`);
+            await api.delete(`/api/admin/users/${id}`);
             toast.success('User deleted successfully');
             fetchData();
         } catch (error) {
@@ -192,7 +192,7 @@ export default function AdminDashboard() {
 
     const handleToggleBanUser = async (id) => {
         try {
-            const res = await api.put(`/admin/users/${id}/ban`);
+            const res = await api.put(`/api/admin/users/${id}/ban`);
             toast.success(res.data.message);
             fetchData();
         } catch (error) {
