@@ -30,7 +30,7 @@ export default function Marketplace() {
         try {
             const token = localStorage.getItem('token');
             if (token) {
-                const response = await api.get('/auth/me');
+                const response = await api.get('/api/auth/me');
                 if (response.data.success) {
                     setUser(response.data.user);
                     fetchPurchasedProducts();
@@ -43,7 +43,7 @@ export default function Marketplace() {
 
     const fetchPurchasedProducts = async () => {
         try {
-            const response = await api.get('/orders/my-purchases');
+            const response = await api.get('/api/orders/my-purchases');
             if (response.data.success) {
                 const productIds = response.data.orders.map(order => order.product._id || order.product);
                 setPurchasedProductIds(productIds);
@@ -55,7 +55,7 @@ export default function Marketplace() {
 
     const fetchProducts = async () => {
         try {
-            const response = await api.get('/products');
+            const response = await api.get('/api/products');
             if (response.data.success) {
                 setProducts(response.data.products);
             }
