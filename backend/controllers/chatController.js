@@ -3,6 +3,8 @@ const Message = require('../models/Message');
 const Product = require('../models/Product');
 const Order = require('../models/Order');
 const Sale = require('../models/Sale');
+const User = require('../models/User');
+const Transaction = require('../models/Transaction');
 
 // @route   POST /api/chat/create
 // @desc    Create or get existing chat room
@@ -575,7 +577,6 @@ exports.confirmDeal = async (req, res) => {
         }
 
         // Check buyer's wallet balance
-        const User = require('../models/User');
         const buyer = await User.findById(chatRoom.buyer);
 
         if (!buyer) {
@@ -625,8 +626,7 @@ exports.confirmDeal = async (req, res) => {
             sellerEarnings: sellerEarnings
         });
 
-        const Transaction = require('../models/Transaction');
-        const User = require('../models/User'); // Assuming User model is available or imported
+        // Transaction and User models already imported at top
 
         await Transaction.create({
             user: chatRoom.seller,
