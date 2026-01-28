@@ -574,6 +574,29 @@ exports.confirmDeal = async (req, res) => {
             });
         }
 
+        // Check buyer's wallet balance
+        const User = require('../models/User');
+        const buyer = await User.findById(chatRoom.buyer);
+
+        if (!buyer) {
+            return res.status(404).json({
+                success: false,
+                message: 'Buyer not found'
+            });
+        }
+
+        const productPrice = chatRoom.product.price;
+
+        if (buyer.walletBalance < productPrice) {
+            return res.status(400).json({
+                success: false,
+                message: `Insufficient funds! You need ₹${productPrice} but have only ₹${buyer.walletBalance}. Please add ₹${productPrice - buyer.walletBalance} to your wallet.`,
+                requiredAmount: productPrice,
+                currentBalance: buyer.walletBalance,
+                shortfall: productPrice - buyer.walletBalance
+            });
+        }
+
         // Update chat room
         chatRoom.dealStatus = 'completed';
         await chatRoom.save();

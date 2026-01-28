@@ -237,7 +237,7 @@ export default function ChatWindow() {
     };
 
     const handleConfirmDeal = async () => {
-        const confirmed = confirm('Confirm deal completion? This will record the sale.');
+        const confirmed = confirm('Confirm deal completion? This will record the sale and deduct funds from your wallet.');
         if (!confirmed) return;
 
         try {
@@ -248,7 +248,28 @@ export default function ChatWindow() {
             }
         } catch (error) {
             console.error('Confirm deal error:', error);
-            alert(error.response?.data?.message || 'Failed to confirm deal');
+            const errorMsg = error.response?.data?.message || 'Failed to confirm deal';
+
+            // Check if it's an insufficient funds error
+            if (error.response?.status === 400 && errorMsg.includes('Insufficient funds')) {
+                const shortfall = error.response?.data?.shortfall || 0;
+                const currentBalance = error.response?.data?.currentBalance || 0;
+                const requiredAmount = error.response?.data?.requiredAmount || 0;
+
+                const confirmAddFunds = confirm(
+                    `❌ Insufficient Wallet Balance!\n\n` +
+                    `💰 Current Balance: ₹${currentBalance}\n` +
+                    `📦 Required Amount: ₹${requiredAmount}\n` +
+                    `➕ Need to Add: ₹${shortfall}\n\n` +
+                    `Would you like to add funds to your wallet now?`
+                );
+
+                if (confirmAddFunds) {
+                    router.push('/buyer/wallet');
+                }
+            } else {
+                toast.error(errorMsg);
+            }
         }
     };
 
