@@ -93,7 +93,7 @@ export default function ChatWindow() {
 
     const fetchChatRoom = async () => {
         try {
-            const response = await api.get(`/chat/${roomId}`);
+            const response = await api.get(`/api/chat/${roomId}`);
             if (response.data.success) {
                 setChatRoom(response.data.chatRoom);
                 setMessages(response.data.messages);
@@ -134,7 +134,7 @@ export default function ChatWindow() {
 
         setSending(true);
         try {
-            const response = await api.post('/chat/message', {
+            const response = await api.post('/api/chat/message', {
                 chatRoomId: roomId,
                 message: newMessage.trim()
             });
@@ -162,7 +162,7 @@ export default function ChatWindow() {
         if (!confirmed) return;
 
         try {
-            const response = await api.post(`/chat/${roomId}/add-admin`);
+            const response = await api.post(`/api/chat/${roomId}/add-admin`);
             if (response.data.success) {
                 toast.success(response.data.message);
                 fetchChatRoom();
@@ -174,7 +174,7 @@ export default function ChatWindow() {
 
     const handleJoinAsAdmin = async () => {
         try {
-            const response = await api.post(`/chat/${roomId}/join-admin`);
+            const response = await api.post(`/api/chat/${roomId}/join-admin`);
             if (response.data.success) {
                 toast.success('You have joined as admin');
                 fetchChatRoom();
@@ -193,7 +193,7 @@ export default function ChatWindow() {
         if (!confirmed) return;
 
         try {
-            const response = await api.post(`/chat/${roomId}/close`);
+            const response = await api.post(`/api/chat/${roomId}/close`);
             if (response.data.success) {
 
                 fetchChatRoom();
@@ -209,7 +209,7 @@ export default function ChatWindow() {
         if (!confirmed) return;
 
         try {
-            const response = await api.post(`/chat/${roomId}/reopen`);
+            const response = await api.post(`/api/chat/${roomId}/reopen`);
             if (response.data.success) {
 
                 fetchChatRoom();
@@ -225,7 +225,7 @@ export default function ChatWindow() {
         if (!confirmed) return;
 
         try {
-            const response = await api.post(`/chat/${roomId}/mark-deal-done`);
+            const response = await api.post(`/api/chat/${roomId}/mark-deal-done`);
             if (response.data.success) {
                 toast.success(response.data.message);
                 fetchChatRoom();
@@ -241,7 +241,7 @@ export default function ChatWindow() {
         if (!confirmed) return;
 
         try {
-            const response = await api.post(`/chat/${roomId}/confirm-deal`);
+            const response = await api.post(`/api/chat/${roomId}/confirm-deal`);
             if (response.data.success) {
                 toast.success(response.data.message);
                 fetchChatRoom();
