@@ -979,3 +979,127 @@ exports.removeUpiId = async (req, res) => {
         });
     }
 };
+
+// @route   GET /api/admin/payments/pending
+// @desc    Get all pending payment requests
+// @access  Private (Admin)
+exports.getPendingPayments = async (req, res) => {
+    try {
+        const Payment = require('../models/Payment');
+        const payments = await Payment.find({ status: 'pending' })
+            .populate('user', 'name email')
+            .sort({ createdAt: -1 });
+
+        res.json({
+            success: true,
+            count: payments.length,
+            payments
+        });
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: 'Server error while fetching pending payments'
+        });
+    }
+};
+
+// @route   PUT /api/admin/payments/:id/approve
+// @desc    Approve a payment request
+// @access  Private (Admin)
+exports.approvePayment = async (req, res) => {
+    try {
+        const Payment = require('../models/Payment');
+        const Transaction = require('../models/Transaction');
+        const payment = await Payment.findById(req.params.id).populate('user');
+
+        if (!payment) {
+            return res.status(404).json({
+                success: false,
+                message: 'Payment not found'
+            });
+        }
+
+        if (payment.status !== 'pending') {
+            return res.status(400).json({
+                success: false,
+                message: 'Payment already processed'
+            });
+        }
+
+        // Update payment status
+        payment.status = 'approved';
+        payment.approvedBy = req.user._id;
+        payment.approvedAt = new Date();
+        await payment.save();
+
+        // Add money to user's wallet
+        await User.findByIdAndUpdate(payment.user._id, {
+            $inc: { walletBalance: payment.amount }
+        });
+
+        // Create transaction record
+        await Transaction.create({
+            user: payment.user._id,
+            type: 'credit',
+            amount: payment.amount,
+            category: 'deposit',
+            description: `Wallet deposit via ${payment.paymentType} (${payment.cryptoCoin || 'UPI'})`,
+            relatedModel: 'Payment',
+            relatedId: payment._id
+        });
+
+        res.json({
+            success: true,
+            message: 'Payment approved successfully',
+            payment
+        });
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: 'Server error while approving payment'
+        });
+    }
+};
+
+// @route   PUT /api/admin/payments/:id/reject
+// @desc    Reject a payment request
+// @access  Private (Admin)
+exports.rejectPayment = async (req, res) => {
+    try {
+        const Payment = require('../models/Payment');
+        const { reason } = req.body;
+
+        const payment = await Payment.findById(req.params.id);
+
+        if (!payment) {
+            return res.status(404).json({
+                success: false,
+                message: 'Payment not found'
+            });
+        }
+
+        if (payment.status !== 'pending') {
+            return res.status(400).json({
+                success: false,
+                message: 'Payment already processed'
+            });
+        }
+
+        payment.status = 'rejected';
+        payment.rejectedBy = req.user._id;
+        payment.rejectedAt = new Date();
+        payment.rejectionReason = reason || 'Payment verification failed';
+        await payment.save();
+
+        res.json({
+            success: true,
+            message: 'Payment rejected',
+            payment
+        });
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: 'Server error while rejecting payment'
+        });
+    }
+};

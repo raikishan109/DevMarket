@@ -22,9 +22,25 @@ exports.getWallet = async (req, res) => {
             .sort({ createdAt: -1 })
             .limit(50);
 
+        // For admin, calculate platform earnings from commissions
+        let platformEarnings = 0;
+        if (req.user.role === 'admin') {
+            const Order = require('../models/Order');
+            const Sale = require('../models/Sale');
+
+            const [orders, sales] = await Promise.all([
+                Order.find({ status: 'completed' }),
+                Sale.find()
+            ]);
+
+            platformEarnings = orders.reduce((sum, order) => sum + (order.platformCommission || 0), 0) +
+                sales.reduce((sum, sale) => sum + (sale.platformCommission || 0), 0);
+        }
+
         res.json({
             success: true,
             balance: calculatedBalance,
+            platformEarnings,
             transactions
         });
     } catch (error) {
