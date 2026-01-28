@@ -83,6 +83,12 @@ export default function ChatWindow() {
         socket.on('receiveMessage', (data) => {
             if (data.chatRoomId === roomId) {
                 setMessages(prev => [...prev, data.message]);
+
+                // If it's a deal status message, refresh chat room to update UI
+                if (data.message.message.includes('marked the deal') ||
+                    data.message.message.includes('Deal completed')) {
+                    fetchChatRoom();
+                }
             }
         });
 
