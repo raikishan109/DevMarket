@@ -43,9 +43,9 @@ export default function DeveloperDashboard() {
     const fetchData = async () => {
         try {
             const [productsRes, salesRes, settingsRes] = await Promise.all([
-                api.get('/products/developer/my-products'),
-                api.get('/orders/my-sales'),
-                api.get('/admin/settings').catch(() => ({ data: { success: false } }))
+                api.get('/api/products/developer/my-products'),
+                api.get('/api/orders/my-sales'),
+                api.get('/api/admin/settings').catch(() => ({ data: { success: false } }))
             ]);
 
             // Set platform commission from settings
@@ -78,7 +78,7 @@ export default function DeveloperDashboard() {
         try {
             const featuresArray = formData.features.split('\n').filter(f => f.trim());
 
-            await api.post('/products', {
+            await api.post('/api/products', {
                 ...formData,
                 features: featuresArray,
                 price: Number(formData.price)
@@ -108,7 +108,7 @@ export default function DeveloperDashboard() {
         if (!confirmed) return;
 
         try {
-            await api.delete(`/products/${id}`);
+            await api.delete(`/api/products/${id}`);
             toast.success('Product deleted successfully');
             fetchData();
         } catch (error) {
