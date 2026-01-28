@@ -19,6 +19,7 @@ export default function AdminDashboard() {
     const [activeChatRooms, setActiveChatRooms] = useState([]);
     const [subAdmins, setSubAdmins] = useState([]);
     const [users, setUsers] = useState([]);
+    const [pendingPayments, setPendingPayments] = useState([]);
     const [settings, setSettings] = useState({ platformCommission: 10 });
     const [activeTab, setActiveTab] = useState('overview');
     const [loading, setLoading] = useState(true);
@@ -44,7 +45,8 @@ export default function AdminDashboard() {
                 api.get('/api/admin/developers'),
                 api.get('/api/admin/settings'),
                 api.get('/api/chat/admin/all'),
-                api.get('/api/admin/users')
+                api.get('/api/admin/users'),
+                api.get('/api/admin/payments/pending')
             ];
 
             // Only fetch sub-admins if user is main admin
@@ -53,7 +55,7 @@ export default function AdminDashboard() {
             }
 
             const results = await Promise.all(promises);
-            const [statsRes, pendingRes, approvedRes, devsRes, settingsRes, chatsRes, usersRes, subAdminsRes] = results;
+            const [statsRes, pendingRes, approvedRes, devsRes, settingsRes, chatsRes, usersRes, paymentsRes, subAdminsRes] = results;
 
             if (statsRes.data.success) setStats(statsRes.data.stats);
             if (pendingRes.data.success) setPendingProducts(pendingRes.data.products);
@@ -62,6 +64,7 @@ export default function AdminDashboard() {
             if (settingsRes.data.success) setSettings(settingsRes.data.settings);
             if (chatsRes.data.success) setActiveChatRooms(chatsRes.data.chatRooms);
             if (usersRes.data.success) setUsers(usersRes.data.users);
+            if (paymentsRes.data.success) setPendingPayments(paymentsRes.data.payments);
             if (subAdminsRes?.data.success) setSubAdmins(subAdminsRes.data.subAdmins);
         } catch (error) {
             console.error('Error fetching data:', error);
@@ -197,6 +200,29 @@ export default function AdminDashboard() {
             fetchData();
         } catch (error) {
             toast.error(error.response?.data?.message || 'Error updating user');
+        }
+    };
+
+    const handleApprovePayment = async (id) => {
+        try {
+            const res = await api.put(`/api/admin/payments/${id}/approve`);
+            toast.success(res.data.message);
+            fetchData();
+        } catch (error) {
+            toast.error(error.response?.data?.message || 'Error approving payment');
+        }
+    };
+
+    const handleRejectPayment = async (id) => {
+        const reason = prompt('Enter rejection reason:');
+        if (!reason) return;
+
+        try {
+            const res = await api.put(`/api/admin/payments/${id}/reject`, { reason });
+            toast.success(res.data.message);
+            fetchData();
+        } catch (error) {
+            toast.error(error.response?.data?.message || 'Error rejecting payment');
         }
     };
 
@@ -361,17 +387,21 @@ export default function AdminDashboard() {
                                 >
                                     👤 Users ({users.length})
                                 </button>
-                                <Link href="/admin/payments">
-                                    <span className="block px-4 py-3 rounded-lg mb-1 font-medium text-gray-700 hover:bg-gray-100 cursor-pointer transition-all">
-                                        💳 Payments
-                                    </span>
-                                </Link>
+                                <button
+                                    onClick={() => setActiveTab('payments')}
+                                    className={`w-full text-left px-4 py-3 rounded-lg mb-1 font-medium transition-all ${activeTab === 'payments'
+                                        ? 'bg-primary-600 text-white shadow-sm'
+                                        : 'text-gray-700 hover:bg-gray-100'
+                                        }`}
+                                >
+                                    💳 Pending Payments ({pendingPayments.length})
+                                </button>
                                 <Link href="/admin/withdrawals">
                                     <span className="block px-4 py-3 rounded-lg mb-1 font-medium text-gray-700 hover:bg-gray-100 cursor-pointer transition-all">
                                         💸 Withdrawals
                                     </span>
                                 </Link>
-                                <Link href="/admin/platform-wallet">
+                                <Link href="/wallet">
                                     <span className="block px-4 py-3 rounded-lg mb-1 font-medium text-gray-700 hover:bg-gray-100 cursor-pointer transition-all">
                                         💰 Platform Wallet
                                     </span>
@@ -929,6 +959,92 @@ export default function AdminDashboard() {
                                     <div className="text-center py-12 bg-gray-50 rounded-lg">
                                         <p className="text-gray-600">No sub-admins created yet</p>
                                         <p className="text-sm text-gray-500 mt-2">Create your first sub-admin using the form above</p>
+                                    </div>
+                                )}
+                            </div>
+                        )}
+
+                        {activeTab === 'payments' && (
+                            <div className="card">
+                                <h2 className="text-2xl font-bold mb-6">💳 Pending Payment Approvals</h2>
+                                {pendingPayments.length > 0 ? (
+                                    <div className="space-y-4">
+                                        {pendingPayments.map((payment) => (
+                                            <div key={payment._id} className="border border-gray-200 rounded-lg p-6 hover:shadow-md transition-shadow">
+                                                <div className="flex justify-between items-start mb-4">
+                                                    <div>
+                                                        <h3 className="text-lg font-bold text-gray-900">
+                                                            {payment.user?.name || 'Unknown User'}
+                                                        </h3>
+                                                        <p className="text-sm text-gray-600">
+                                                            {payment.user?.email}
+                                                        </p>
+                                                        <div className="mt-2 space-x-2">
+                                                            <span className="badge badge-warning">Pending</span>
+                                                            <span className="badge badge-info">{payment.paymentType === 'crypto' ? 'Crypto' : 'UPI'}</span>
+                                                        </div>
+                                                    </div>
+                                                    <div className="text-right">
+                                                        <p className="text-2xl font-bold text-primary-600">₹{payment.amount}</p>
+                                                        <p className="text-xs text-gray-500 mt-1">
+                                                            {new Date(payment.createdAt).toLocaleString()}
+                                                        </p>
+                                                    </div>
+                                                </div>
+
+                                                <div className="bg-gray-50 rounded-lg p-4 mb-4 space-y-2">
+                                                    {payment.paymentType === 'crypto' ? (
+                                                        <>
+                                                            <div className="flex justify-between text-sm">
+                                                                <span className="text-gray-600">Coin:</span>
+                                                                <span className="font-semibold">{payment.cryptoCoin}</span>
+                                                            </div>
+                                                            <div className="flex justify-between text-sm">
+                                                                <span className="text-gray-600">Network:</span>
+                                                                <span className="font-semibold">{payment.cryptoNetwork}</span>
+                                                            </div>
+                                                            <div className="flex justify-between text-sm">
+                                                                <span className="text-gray-600">TX Hash:</span>
+                                                                <span className="font-mono text-xs break-all">{payment.transactionHash}</span>
+                                                            </div>
+                                                        </>
+                                                    ) : (
+                                                        <>
+                                                            <div className="flex justify-between text-sm">
+                                                                <span className="text-gray-600">UPI ID:</span>
+                                                                <span className="font-semibold">{payment.upiId}</span>
+                                                            </div>
+                                                            <div className="flex justify-between text-sm">
+                                                                <span className="text-gray-600">UTR Number:</span>
+                                                                <span className="font-semibold">{payment.utrNumber}</span>
+                                                            </div>
+                                                        </>
+                                                    )}
+                                                </div>
+
+                                                <div className="flex space-x-4">
+                                                    <button
+                                                        onClick={() => handleApprovePayment(payment._id)}
+                                                        className="btn btn-success flex items-center space-x-2"
+                                                    >
+                                                        <FiCheck />
+                                                        <span>Approve & Credit ₹{payment.amount}</span>
+                                                    </button>
+                                                    <button
+                                                        onClick={() => handleRejectPayment(payment._id)}
+                                                        className="btn btn-danger flex items-center space-x-2"
+                                                    >
+                                                        <FiX />
+                                                        <span>Reject</span>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                ) : (
+                                    <div className="text-center py-12 bg-gray-50 rounded-lg">
+                                        <p className="text-gray-600 text-lg">✅ No pending payment requests</p>
+                                        <p className="text-sm text-gray-500 mt-2">All payments have been processed</p>
                                     </div>
                                 )}
                             </div>
