@@ -997,170 +997,254 @@ export default function AdminDashboard() {
                         )}
 
                         {activeTab === 'payments' && (
-                            <div className="card">
-                                <h2 className="text-2xl font-bold mb-6">💳 Pending Payment Approvals</h2>
-                                {pendingPayments.length > 0 ? (
-                                    <div className="space-y-4">
-                                        {pendingPayments.map((payment) => (
-                                            <div key={payment._id} className="border border-gray-200 rounded-lg p-6 hover:shadow-md transition-shadow">
-                                                <div className="flex justify-between items-start mb-4">
-                                                    <div>
-                                                        <h3 className="text-lg font-bold text-gray-900">
-                                                            {payment.user?.name || 'Unknown User'}
-                                                        </h3>
-                                                        <p className="text-sm text-gray-600">
-                                                            {payment.user?.email}
-                                                        </p>
-                                                        <div className="mt-2 space-x-2">
-                                                            <span className="badge badge-warning">Pending</span>
-                                                            <span className="badge badge-info">{payment.paymentType === 'crypto' ? 'Crypto' : 'UPI'}</span>
+                            <div className="space-y-6">
+                                {/* Pending Payments */}
+                                <div className="card">
+                                    <h2 className="text-2xl font-bold mb-6">💳 Pending Payment Approvals</h2>
+                                    {pendingPayments.length > 0 ? (
+                                        <div className="space-y-4">
+                                            {pendingPayments.map((payment) => (
+                                                <div key={payment._id} className="border border-yellow-200 bg-yellow-50 rounded-lg p-6 hover:shadow-md transition-shadow">
+                                                    <div className="flex justify-between items-start mb-4">
+                                                        <div>
+                                                            <h3 className="text-lg font-bold text-gray-900">
+                                                                {payment.user?.name || 'Unknown User'}
+                                                            </h3>
+                                                            <p className="text-sm text-gray-600">
+                                                                {payment.user?.email}
+                                                            </p>
+                                                            <div className="mt-2 space-x-2">
+                                                                <span className="badge badge-warning">Pending</span>
+                                                                <span className="badge badge-info">{payment.paymentType === 'crypto' ? 'Crypto' : 'UPI'}</span>
+                                                            </div>
+                                                        </div>
+                                                        <div className="text-right">
+                                                            <p className="text-2xl font-bold text-primary-600">₹{payment.amount}</p>
+                                                            <p className="text-xs text-gray-500 mt-1">
+                                                                {new Date(payment.createdAt).toLocaleString()}
+                                                            </p>
                                                         </div>
                                                     </div>
-                                                    <div className="text-right">
-                                                        <p className="text-2xl font-bold text-primary-600">₹{payment.amount}</p>
-                                                        <p className="text-xs text-gray-500 mt-1">
-                                                            {new Date(payment.createdAt).toLocaleString()}
-                                                        </p>
+
+                                                    <div className="bg-white rounded-lg p-4 mb-4 space-y-2">
+                                                        {payment.paymentType === 'crypto' ? (
+                                                            <>
+                                                                <div className="flex justify-between text-sm">
+                                                                    <span className="text-gray-600">Coin:</span>
+                                                                    <span className="font-semibold">{payment.cryptoCoin}</span>
+                                                                </div>
+                                                                <div className="flex justify-between text-sm">
+                                                                    <span className="text-gray-600">Network:</span>
+                                                                    <span className="font-semibold">{payment.cryptoNetwork}</span>
+                                                                </div>
+                                                                <div className="flex justify-between text-sm">
+                                                                    <span className="text-gray-600">TX Hash:</span>
+                                                                    <span className="font-mono text-xs break-all">{payment.transactionHash}</span>
+                                                                </div>
+                                                            </>
+                                                        ) : (
+                                                            <>
+                                                                <div className="flex justify-between text-sm">
+                                                                    <span className="text-gray-600">UPI ID:</span>
+                                                                    <span className="font-semibold">{payment.upiId}</span>
+                                                                </div>
+                                                                <div className="flex justify-between text-sm">
+                                                                    <span className="text-gray-600">UTR Number:</span>
+                                                                    <span className="font-semibold">{payment.utrNumber}</span>
+                                                                </div>
+                                                            </>
+                                                        )}
+                                                    </div>
+
+                                                    <div className="flex space-x-4">
+                                                        <button
+                                                            onClick={() => handleApprovePayment(payment._id)}
+                                                            className="btn btn-success flex items-center space-x-2"
+                                                        >
+                                                            <FiCheck />
+                                                            <span>Approve & Credit ₹{payment.amount}</span>
+                                                        </button>
+                                                        <button
+                                                            onClick={() => handleRejectPayment(payment._id)}
+                                                            className="btn btn-danger flex items-center space-x-2"
+                                                        >
+                                                            <FiX />
+                                                            <span>Reject</span>
+                                                        </button>
                                                     </div>
                                                 </div>
+                                            ))}
+                                        </div>
+                                    ) : (
+                                        <div className="text-center py-8 bg-gray-50 rounded-lg">
+                                            <p className="text-gray-600">✅ No pending payment requests</p>
+                                        </div>
+                                    )}
+                                </div>
 
-                                                <div className="bg-gray-50 rounded-lg p-4 mb-4 space-y-2">
-                                                    {payment.paymentType === 'crypto' ? (
-                                                        <>
-                                                            <div className="flex justify-between text-sm">
-                                                                <span className="text-gray-600">Coin:</span>
-                                                                <span className="font-semibold">{payment.cryptoCoin}</span>
-                                                            </div>
-                                                            <div className="flex justify-between text-sm">
-                                                                <span className="text-gray-600">Network:</span>
-                                                                <span className="font-semibold">{payment.cryptoNetwork}</span>
-                                                            </div>
-                                                            <div className="flex justify-between text-sm">
-                                                                <span className="text-gray-600">TX Hash:</span>
-                                                                <span className="font-mono text-xs break-all">{payment.transactionHash}</span>
-                                                            </div>
-                                                        </>
-                                                    ) : (
-                                                        <>
-                                                            <div className="flex justify-between text-sm">
-                                                                <span className="text-gray-600">UPI ID:</span>
-                                                                <span className="font-semibold">{payment.upiId}</span>
-                                                            </div>
-                                                            <div className="flex justify-between text-sm">
-                                                                <span className="text-gray-600">UTR Number:</span>
-                                                                <span className="font-semibold">{payment.utrNumber}</span>
-                                                            </div>
-                                                        </>
-                                                    )}
-                                                </div>
-
-                                                <div className="flex space-x-4">
-                                                    <button
-                                                        onClick={() => handleApprovePayment(payment._id)}
-                                                        className="btn btn-success flex items-center space-x-2"
-                                                    >
-                                                        <FiCheck />
-                                                        <span>Approve & Credit ₹{payment.amount}</span>
-                                                    </button>
-                                                    <button
-                                                        onClick={() => handleRejectPayment(payment._id)}
-                                                        className="btn btn-danger flex items-center space-x-2"
-                                                    >
-                                                        <FiX />
-                                                        <span>Reject</span>
-                                                    </button>
-                                                </div>
-                                            </div>
-                                        ))}
+                                {/* Payment History */}
+                                <div className="card">
+                                    <h2 className="text-xl font-bold mb-4">📜 Recent Payment History</h2>
+                                    <div className="overflow-x-auto">
+                                        <table className="min-w-full divide-y divide-gray-200">
+                                            <thead className="bg-gray-50">
+                                                <tr>
+                                                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">User</th>
+                                                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Amount</th>
+                                                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Type</th>
+                                                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
+                                                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Date</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody className="bg-white divide-y divide-gray-200">
+                                                {pendingPayments.slice(0, 10).map((payment) => (
+                                                    <tr key={payment._id}>
+                                                        <td className="px-4 py-3 text-sm">{payment.user?.name}</td>
+                                                        <td className="px-4 py-3 text-sm font-semibold">₹{payment.amount}</td>
+                                                        <td className="px-4 py-3 text-sm">{payment.paymentType === 'crypto' ? 'Crypto' : 'UPI'}</td>
+                                                        <td className="px-4 py-3">
+                                                            <span className={`badge ${payment.status === 'approved' ? 'badge-success' :
+                                                                payment.status === 'rejected' ? 'badge-danger' :
+                                                                    'badge-warning'
+                                                                }`}>
+                                                                {payment.status === 'approved' ? '✓ Approved' :
+                                                                    payment.status === 'rejected' ? '✗ Rejected' :
+                                                                        '⏳ Pending'}
+                                                            </span>
+                                                        </td>
+                                                        <td className="px-4 py-3 text-sm text-gray-500">
+                                                            {new Date(payment.createdAt).toLocaleDateString()}
+                                                        </td>
+                                                    </tr>
+                                                ))}
+                                            </tbody>
+                                        </table>
                                     </div>
-                                ) : (
-                                    <div className="text-center py-12 bg-gray-50 rounded-lg">
-                                        <p className="text-gray-600 text-lg">✅ No pending payment requests</p>
-                                        <p className="text-sm text-gray-500 mt-2">All payments have been processed</p>
-                                    </div>
-                                )}
+                                </div>
                             </div>
                         )}
 
                         {activeTab === 'withdrawals' && (
-                            <div className="card">
-                                <h2 className="text-2xl font-bold mb-6">💸 Pending Withdrawal Approvals</h2>
-                                {pendingWithdrawals.length > 0 ? (
-                                    <div className="space-y-4">
-                                        {pendingWithdrawals.map((withdrawal) => (
-                                            <div key={withdrawal._id} className="border border-gray-200 rounded-lg p-6 hover:shadow-md transition-shadow">
-                                                <div className="flex justify-between items-start mb-4">
-                                                    <div>
-                                                        <h3 className="text-lg font-bold text-gray-900">
-                                                            {withdrawal.user?.name || 'Unknown User'}
-                                                        </h3>
-                                                        <p className="text-sm text-gray-600">
-                                                            {withdrawal.user?.email}
-                                                        </p>
-                                                        <div className="mt-2 space-x-2">
-                                                            <span className="badge badge-warning">Pending</span>
-                                                            <span className="badge badge-info">{withdrawal.withdrawalType === 'crypto' ? 'Crypto' : 'UPI'}</span>
+                            <div className="space-y-6">
+                                {/* Pending Withdrawals */}
+                                <div className="card">
+                                    <h2 className="text-2xl font-bold mb-6">💸 Pending Withdrawal Approvals</h2>
+                                    {pendingWithdrawals.length > 0 ? (
+                                        <div className="space-y-4">
+                                            {pendingWithdrawals.map((withdrawal) => (
+                                                <div key={withdrawal._id} className="border border-yellow-200 bg-yellow-50 rounded-lg p-6 hover:shadow-md transition-shadow">
+                                                    <div className="flex justify-between items-start mb-4">
+                                                        <div>
+                                                            <h3 className="text-lg font-bold text-gray-900">
+                                                                {withdrawal.user?.name || 'Unknown User'}
+                                                            </h3>
+                                                            <p className="text-sm text-gray-600">
+                                                                {withdrawal.user?.email}
+                                                            </p>
+                                                            <div className="mt-2 space-x-2">
+                                                                <span className="badge badge-warning">Pending</span>
+                                                                <span className="badge badge-info">{withdrawal.withdrawalType === 'crypto' ? 'Crypto' : 'UPI'}</span>
+                                                            </div>
+                                                        </div>
+                                                        <div className="text-right">
+                                                            <p className="text-2xl font-bold text-red-600">-₹{withdrawal.amount}</p>
+                                                            <p className="text-xs text-gray-500 mt-1">
+                                                                {new Date(withdrawal.createdAt).toLocaleString()}
+                                                            </p>
                                                         </div>
                                                     </div>
-                                                    <div className="text-right">
-                                                        <p className="text-2xl font-bold text-red-600">-₹{withdrawal.amount}</p>
-                                                        <p className="text-xs text-gray-500 mt-1">
-                                                            {new Date(withdrawal.createdAt).toLocaleString()}
-                                                        </p>
+
+                                                    <div className="bg-white rounded-lg p-4 mb-4 space-y-2">
+                                                        {withdrawal.withdrawalType === 'crypto' ? (
+                                                            <>
+                                                                <div className="flex justify-between text-sm">
+                                                                    <span className="text-gray-600">Coin:</span>
+                                                                    <span className="font-semibold">{withdrawal.cryptoCoinType}</span>
+                                                                </div>
+                                                                <div className="flex justify-between text-sm">
+                                                                    <span className="text-gray-600">Network:</span>
+                                                                    <span className="font-semibold">{withdrawal.cryptoNetwork}</span>
+                                                                </div>
+                                                                <div className="flex justify-between text-sm">
+                                                                    <span className="text-gray-600">Wallet Address:</span>
+                                                                    <span className="font-mono text-xs break-all">{withdrawal.cryptoAddress}</span>
+                                                                </div>
+                                                            </>
+                                                        ) : (
+                                                            <>
+                                                                <div className="flex justify-between text-sm">
+                                                                    <span className="text-gray-600">UPI ID:</span>
+                                                                    <span className="font-semibold">{withdrawal.upiId}</span>
+                                                                </div>
+                                                            </>
+                                                        )}
+                                                    </div>
+
+                                                    <div className="flex space-x-4">
+                                                        <button
+                                                            onClick={() => handleApproveWithdrawal(withdrawal._id)}
+                                                            className="btn btn-success flex items-center space-x-2"
+                                                        >
+                                                            <FiCheck />
+                                                            <span>Approve & Debit ₹{withdrawal.amount}</span>
+                                                        </button>
+                                                        <button
+                                                            onClick={() => handleRejectWithdrawal(withdrawal._id)}
+                                                            className="btn btn-danger flex items-center space-x-2"
+                                                        >
+                                                            <FiX />
+                                                            <span>Reject</span>
+                                                        </button>
                                                     </div>
                                                 </div>
+                                            ))}
+                                        </div>
+                                    ) : (
+                                        <div className="text-center py-8 bg-gray-50 rounded-lg">
+                                            <p className="text-gray-600">✅ No pending withdrawal requests</p>
+                                        </div>
+                                    )}
+                                </div>
 
-                                                <div className="bg-gray-50 rounded-lg p-4 mb-4 space-y-2">
-                                                    {withdrawal.withdrawalType === 'crypto' ? (
-                                                        <>
-                                                            <div className="flex justify-between text-sm">
-                                                                <span className="text-gray-600">Coin:</span>
-                                                                <span className="font-semibold">{withdrawal.cryptoCoinType}</span>
-                                                            </div>
-                                                            <div className="flex justify-between text-sm">
-                                                                <span className="text-gray-600">Network:</span>
-                                                                <span className="font-semibold">{withdrawal.cryptoNetwork}</span>
-                                                            </div>
-                                                            <div className="flex justify-between text-sm">
-                                                                <span className="text-gray-600">Wallet Address:</span>
-                                                                <span className="font-mono text-xs break-all">{withdrawal.cryptoAddress}</span>
-                                                            </div>
-                                                        </>
-                                                    ) : (
-                                                        <>
-                                                            <div className="flex justify-between text-sm">
-                                                                <span className="text-gray-600">UPI ID:</span>
-                                                                <span className="font-semibold">{withdrawal.upiId}</span>
-                                                            </div>
-                                                        </>
-                                                    )}
-                                                </div>
-
-                                                <div className="flex space-x-4">
-                                                    <button
-                                                        onClick={() => handleApproveWithdrawal(withdrawal._id)}
-                                                        className="btn btn-success flex items-center space-x-2"
-                                                    >
-                                                        <FiCheck />
-                                                        <span>Approve & Debit ₹{withdrawal.amount}</span>
-                                                    </button>
-                                                    <button
-                                                        onClick={() => handleRejectWithdrawal(withdrawal._id)}
-                                                        className="btn btn-danger flex items-center space-x-2"
-                                                    >
-                                                        <FiX />
-                                                        <span>Reject</span>
-                                                    </button>
-                                                </div>
-                                            </div>
-                                        ))}
+                                {/* Withdrawal History */}
+                                <div className="card">
+                                    <h2 className="text-xl font-bold mb-4">📜 Recent Withdrawal History</h2>
+                                    <div className="overflow-x-auto">
+                                        <table className="min-w-full divide-y divide-gray-200">
+                                            <thead className="bg-gray-50">
+                                                <tr>
+                                                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">User</th>
+                                                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Amount</th>
+                                                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Type</th>
+                                                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
+                                                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Date</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody className="bg-white divide-y divide-gray-200">
+                                                {pendingWithdrawals.slice(0, 10).map((withdrawal) => (
+                                                    <tr key={withdrawal._id}>
+                                                        <td className="px-4 py-3 text-sm">{withdrawal.user?.name}</td>
+                                                        <td className="px-4 py-3 text-sm font-semibold text-red-600">-₹{withdrawal.amount}</td>
+                                                        <td className="px-4 py-3 text-sm">{withdrawal.withdrawalType === 'crypto' ? 'Crypto' : 'UPI'}</td>
+                                                        <td className="px-4 py-3">
+                                                            <span className={`badge ${withdrawal.status === 'completed' ? 'badge-success' :
+                                                                    withdrawal.status === 'failed' ? 'badge-danger' :
+                                                                        'badge-warning'
+                                                                }`}>
+                                                                {withdrawal.status === 'completed' ? '✓ Approved' :
+                                                                    withdrawal.status === 'failed' ? '✗ Rejected' :
+                                                                        '⏳ Pending'}
+                                                            </span>
+                                                        </td>
+                                                        <td className="px-4 py-3 text-sm text-gray-500">
+                                                            {new Date(withdrawal.createdAt).toLocaleDateString()}
+                                                        </td>
+                                                    </tr>
+                                                ))}
+                                            </tbody>
+                                        </table>
                                     </div>
-                                ) : (
-                                    <div className="text-center py-12 bg-gray-50 rounded-lg">
-                                        <p className="text-gray-600 text-lg">✅ No pending withdrawal requests</p>
-                                        <p className="text-sm text-gray-500 mt-2">All withdrawals have been processed</p>
-                                    </div>
-                                )}
+                                </div>
                             </div>
                         )}
 
