@@ -367,127 +367,9 @@ export default function AdminDashboard() {
                     </div>
                 </div>
 
-                {/* Main Layout: Sidebar + Content */}
-                <div className="flex flex-col lg:flex-row gap-6">
-                    {/* Vertical Sidebar Navigation */}
-                    <aside className="lg:w-64 flex-shrink-0">
-                        <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden sticky top-4">
-                            <div className="p-4 bg-gradient-to-r from-primary-600 to-primary-700">
-                                <h3 className="text-white font-bold text-lg">Admin Menu</h3>
-                            </div>
-                            <nav className="p-2">
-                                <button
-                                    onClick={() => setActiveTab('overview')}
-                                    className={`w-full text-left px-4 py-3 rounded-lg mb-1 font-medium transition-all ${activeTab === 'overview'
-                                        ? 'bg-primary-600 text-white shadow-sm'
-                                        : 'text-gray-700 hover:bg-gray-100'
-                                        }`}
-                                >
-                                    📊 Overview
-                                </button>
-                                <button
-                                    onClick={() => setActiveTab('pending')}
-                                    className={`w-full text-left px-4 py-3 rounded-lg mb-1 font-medium transition-all ${activeTab === 'pending'
-                                        ? 'bg-primary-600 text-white shadow-sm'
-                                        : 'text-gray-700 hover:bg-gray-100'
-                                        }`}
-                                >
-                                    ⏳ Pending Products ({pendingProducts.length})
-                                </button>
-                                <button
-                                    onClick={() => setActiveTab('approved')}
-                                    className={`w-full text-left px-4 py-3 rounded-lg mb-1 font-medium transition-all ${activeTab === 'approved'
-                                        ? 'bg-primary-600 text-white shadow-sm'
-                                        : 'text-gray-700 hover:bg-gray-100'
-                                        }`}
-                                >
-                                    ✅ Approved Products ({approvedProducts.length})
-                                </button>
-                                <button
-                                    onClick={() => setActiveTab('developers')}
-                                    className={`w-full text-left px-4 py-3 rounded-lg mb-1 font-medium transition-all ${activeTab === 'developers'
-                                        ? 'bg-primary-600 text-white shadow-sm'
-                                        : 'text-gray-700 hover:bg-gray-100'
-                                        }`}
-                                >
-                                    👨‍💻 Developers
-                                </button>
-                                <button
-                                    onClick={() => setActiveTab('users')}
-                                    className={`w-full text-left px-4 py-3 rounded-lg mb-1 font-medium transition-all ${activeTab === 'users'
-                                        ? 'bg-primary-600 text-white shadow-sm'
-                                        : 'text-gray-700 hover:bg-gray-100'
-                                        }`}
-                                >
-                                    👤 Users ({users.length})
-                                </button>
-                                <button
-                                    onClick={() => setActiveTab('payments')}
-                                    className={`w-full text-left px-4 py-3 rounded-lg mb-1 font-medium transition-all ${activeTab === 'payments'
-                                        ? 'bg-primary-600 text-white shadow-sm'
-                                        : 'text-gray-700 hover:bg-gray-100'
-                                        }`}
-                                >
-                                    💳 Pending Payments ({pendingPayments.length})
-                                </button>
-                                <button
-                                    onClick={() => setActiveTab('withdrawals')}
-                                    className={`w-full text-left px-4 py-3 rounded-lg mb-1 font-medium transition-all ${activeTab === 'withdrawals'
-                                        ? 'bg-primary-600 text-white shadow-sm'
-                                        : 'text-gray-700 hover:bg-gray-100'
-                                        }`}
-                                >
-                                    💸 Pending Withdrawals ({pendingWithdrawals.length})
-                                </button>
-                                <Link href="/admin/platform-wallet">
-                                    <span className="block px-4 py-3 rounded-lg mb-1 font-medium text-gray-700 hover:bg-gray-100 cursor-pointer transition-all">
-                                        💰 Platform Wallet
-                                    </span>
-                                </Link>
-                                <button
-                                    onClick={() => setActiveTab('reportedChats')}
-                                    className={`w-full text-left px-4 py-3 rounded-lg mb-1 font-medium transition-all ${activeTab === 'reportedChats'
-                                        ? 'bg-primary-600 text-white shadow-sm'
-                                        : 'text-gray-700 hover:bg-gray-100'
-                                        }`}
-                                >
-                                    🚨 Reported Chats ({activeChatRooms.filter(chat => chat.adminRequested && !chat.admin).length})
-                                </button>
-                                <button
-                                    onClick={() => setActiveTab('chats')}
-                                    className={`w-full text-left px-4 py-3 rounded-lg mb-1 font-medium transition-all ${activeTab === 'chats'
-                                        ? 'bg-primary-600 text-white shadow-sm'
-                                        : 'text-gray-700 hover:bg-gray-100'
-                                        }`}
-                                >
-                                    💬 All Chats ({activeChatRooms.length})
-                                </button>
-                                {!user?.isSubAdmin && (
-                                    <button
-                                        onClick={() => setActiveTab('subAdmins')}
-                                        className={`w-full text-left px-4 py-3 rounded-lg mb-1 font-medium transition-all ${activeTab === 'subAdmins'
-                                            ? 'bg-primary-600 text-white shadow-sm'
-                                            : 'text-gray-700 hover:bg-gray-100'
-                                            }`}
-                                    >
-                                        👥 Sub-Admins ({subAdmins.length})
-                                    </button>
-                                )}
-                                <button
-                                    onClick={() => setActiveTab('settings')}
-                                    className={`w-full text-left px-4 py-3 rounded-lg mb-1 font-medium transition-all ${activeTab === 'settings'
-                                        ? 'bg-primary-600 text-white shadow-sm'
-                                        : 'text-gray-700 hover:bg-gray-100'
-                                        }`}
-                                >
-                                    ⚙️ Settings
-                                </button>
-                            </nav>
-                        </div>
-                    </aside>
-
-                    {/* Main Content Area */}
-                    <main className="flex-1 min-w-0">
+                {/* Main Content Area */}
+                <div className="w-full">
+                    <main className="w-full">
 
                         {/* Tab Content */}
                         {activeTab === 'overview' && (
@@ -1508,9 +1390,7 @@ export default function AdminDashboard() {
                             </div>
                         )}
                     </main>
-                    {/* End Main Content Area */}
                 </div>
-                {/* End Flex Container */}
             </div>
         </AdminLayout>
     );
