@@ -7,7 +7,12 @@
     @apply bg-gray-900 text-gray-100;
   }
 
-  h1, h2, h3, h4, h5, h6 {
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
     @apply text-gray-100;
   }
 
@@ -31,8 +36,62 @@
     @apply bg-gray-700/50;
   }
 
-  input, textarea, select {
+  input,
+  textarea,
+  select {
     @apply bg-gray-700 border-gray-600 text-gray-100 placeholder-gray-400;
+  }
+
+  /* Fix: dark text classes invisible on dark bg — remap to lighter */
+  .text-gray-900 {
+    color: #f3f4f6 !important;
+  }
+
+  .text-gray-800 {
+    color: #e5e7eb !important;
+  }
+
+  .text-gray-700 {
+    color: #d1d5db !important;
+  }
+
+  .text-gray-600 {
+    color: #9ca3af !important;
+  }
+
+  .text-gray-500 {
+    color: #9ca3af !important;
+  }
+
+  /* Fix: white/light backgrounds inside dark cards */
+  .bg-white {
+    background-color: #1f2937 !important;
+  }
+
+  .bg-gray-50 {
+    background-color: #1f2937 !important;
+  }
+
+  .bg-gray-100 {
+    background-color: #374151 !important;
+  }
+
+  .bg-gray-200 {
+    background-color: #374151 !important;
+  }
+
+  /* Fix: border colors for dark theme */
+  .border-gray-200 {
+    border-color: #374151 !important;
+  }
+
+  .border-gray-300 {
+    border-color: #4b5563 !important;
+  }
+
+  /* Fix: divide colors */
+  .divide-gray-200>*+* {
+    border-color: #374151 !important;
   }
 }
 
@@ -114,28 +173,59 @@
 
 /* Animations */
 @keyframes shimmer {
-  0% { background-position: -1000px 0; }
-  100% { background-position: 1000px 0; }
+  0% {
+    background-position: -1000px 0;
+  }
+
+  100% {
+    background-position: 1000px 0;
+  }
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
 }
 
 @keyframes slideUp {
-  from { transform: translateY(20px); opacity: 0; }
-  to { transform: translateY(0); opacity: 1; }
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
 }
 
 @keyframes slideIn {
-  from { transform: translateX(100%); opacity: 0; }
-  to { transform: translateX(0); opacity: 1; }
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
 }
 
 @keyframes scaleIn {
-  from { transform: scale(0.9); opacity: 0; }
-  to { transform: scale(1); opacity: 1; }
+  from {
+    transform: scale(0.9);
+    opacity: 0;
+  }
+
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
 }
 
 .skeleton {
@@ -144,7 +234,18 @@
   background-size: 1000px 100%;
 }
 
-.animate-fadeIn { animation: fadeIn 0.2s ease-out; }
-.animate-slideUp { animation: slideUp 0.3s ease-out; }
-.animate-slideIn { animation: slideIn 0.3s ease-out; }
-.animate-scaleIn { animation: scaleIn 0.2s ease-out; }
+.animate-fadeIn {
+  animation: fadeIn 0.2s ease-out;
+}
+
+.animate-slideUp {
+  animation: slideUp 0.3s ease-out;
+}
+
+.animate-slideIn {
+  animation: slideIn 0.3s ease-out;
+}
+
+.animate-scaleIn {
+  animation: scaleIn 0.2s ease-out;
+}
