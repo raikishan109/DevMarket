@@ -94,4 +94,46 @@ const { getPlatformWallet, getPlatformTransactions } = require('../controllers/a
 router.get('/platform-wallet', getPlatformWallet);
 router.get('/platform-wallet/transactions', getPlatformTransactions);
 
+// ===== DATABASE RESET (Main Admin Only) =====
+const { mainAdminOnly } = require('../middleware/subAdminMiddleware');
+router.delete('/reset-database', mainAdminOnly, async (req, res) => {
+    try {
+        const User = require('../models/User');
+        const Product = require('../models/Product');
+        const Order = require('../models/Order');
+        const Payment = require('../models/Payment');
+        const Withdrawal = require('../models/Withdrawal');
+        const ChatRoom = require('../models/ChatRoom');
+        const Message = require('../models/Message');
+        const Review = require('../models/Review');
+        const Sale = require('../models/Sale');
+        const Transaction = require('../models/Transaction');
+
+        // Get main admin email from env
+        const adminEmail = process.env.ADMIN_EMAIL;
+
+        // Delete everything EXCEPT main admin
+        await User.deleteMany({ email: { $ne: adminEmail } });
+        await Product.deleteMany({});
+        await Order.deleteMany({});
+        await Payment.deleteMany({});
+        await Withdrawal.deleteMany({});
+        await ChatRoom.deleteMany({});
+        await Message.deleteMany({});
+        await Review.deleteMany({});
+        await Sale.deleteMany({});
+        await Transaction.deleteMany({});
+
+        console.log(`✅ Database reset by admin: ${req.user.email}`);
+
+        res.json({
+            success: true,
+            message: 'Database reset successfully. Main admin account preserved.'
+        });
+    } catch (error) {
+        console.error('Database reset error:', error);
+        res.status(500).json({ success: false, message: 'Failed to reset database' });
+    }
+});
+
 module.exports = router;

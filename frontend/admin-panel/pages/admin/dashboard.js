@@ -1470,6 +1470,40 @@ export default function AdminDashboard() {
                                             )}
                                         </div>
                                     </div>
+
+                                    {/* ===== DATABASE RESET ===== */}
+                                    {!user?.isSubAdmin && (
+                                        <div className="mt-8 border-2 border-red-200 rounded-xl p-6 bg-red-50">
+                                            <h3 className="text-lg font-bold text-red-700 mb-2 flex items-center gap-2">
+                                                ⚠️ Danger Zone — Database Reset
+                                            </h3>
+                                            <p className="text-sm text-red-600 mb-4">
+                                                This will permanently delete <strong>all users, products, orders, payments, chats, reviews</strong> and all other data.<br />
+                                                <strong>Main admin account will NOT be deleted.</strong>
+                                            </p>
+                                            <button
+                                                type="button"
+                                                onClick={async () => {
+                                                    const confirm1 = window.confirm('⚠️ WARNING: This will delete ALL data except your admin account. Are you sure?');
+                                                    if (!confirm1) return;
+                                                    const confirm2 = window.confirm('🔴 FINAL WARNING: This action CANNOT be undone. Type OK to confirm.');
+                                                    if (!confirm2) return;
+                                                    try {
+                                                        const res = await api.delete('/api/admin/reset-database');
+                                                        if (res.data.success) {
+                                                            toast.success('✅ Database reset successfully! Admin account preserved.');
+                                                            fetchData();
+                                                        }
+                                                    } catch (error) {
+                                                        toast.error(error.response?.data?.message || 'Failed to reset database');
+                                                    }
+                                                }}
+                                                className="bg-red-600 hover:bg-red-700 text-white font-bold px-6 py-3 rounded-xl transition-colors flex items-center gap-2"
+                                            >
+                                                🗑️ Reset Entire Database
+                                            </button>
+                                        </div>
+                                    )}
                                 </div>
                             </div>
                         )}
