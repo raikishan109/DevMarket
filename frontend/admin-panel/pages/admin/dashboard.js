@@ -439,7 +439,7 @@ export default function AdminDashboard() {
                                 >
                                     💸 Pending Withdrawals ({pendingWithdrawals.length})
                                 </button>
-                                <Link href="/wallet">
+                                <Link href="/admin/platform-wallet">
                                     <span className="block px-4 py-3 rounded-lg mb-1 font-medium text-gray-700 hover:bg-gray-100 cursor-pointer transition-all">
                                         💰 Platform Wallet
                                     </span>
