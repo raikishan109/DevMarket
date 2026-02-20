@@ -5,7 +5,7 @@ import { getUser, clearAuth } from '../utils/auth';
 import {
     FiLogOut, FiShield, FiGrid, FiPackage, FiUsers,
     FiDollarSign, FiMessageSquare, FiSettings, FiCreditCard,
-    FiArrowDownCircle, FiCheckSquare, FiAlertCircle, FiUserCheck, FiMenu, FiX
+    FiArrowDownCircle, FiCheckSquare, FiAlertCircle, FiUserCheck, FiMenu, FiX, FiDatabase
 } from 'react-icons/fi';
 
 export default function AdminLayout({ children }) {
@@ -47,6 +47,7 @@ export default function AdminLayout({ children }) {
         { href: '/admin/dashboard?tab=chats', tab: 'chats', label: 'All Chats', icon: <FiMessageSquare /> },
         ...(!user?.isSubAdmin ? [{ href: '/admin/dashboard?tab=subAdmins', tab: 'subAdmins', label: 'Sub-Admins', icon: <FiUsers /> }] : []),
         { href: '/admin/dashboard?tab=settings', tab: 'settings', label: 'Settings', icon: <FiSettings /> },
+        ...(!user?.isSubAdmin ? [{ href: '/admin/dashboard?tab=database', tab: 'database', label: 'Database', icon: <FiDatabase /> }] : []),
     ];
 
     const SidebarContent = () => (

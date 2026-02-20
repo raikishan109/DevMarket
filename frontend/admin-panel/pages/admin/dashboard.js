@@ -1398,6 +1398,57 @@ export default function AdminDashboard() {
                                 </div>
                             </div>
                         )}
+
+                        {/* ===== DATABASE TAB ===== */}
+                        {activeTab === 'database' && !user?.isSubAdmin && (
+                            <div className="p-6">
+                                <h2 className="text-2xl font-bold text-gray-800 mb-6">🗄️ Database Management</h2>
+
+                                <div className="max-w-2xl space-y-6">
+                                    {/* Info Card */}
+                                    <div className="bg-blue-50 border border-blue-200 rounded-xl p-5">
+                                        <h3 className="font-semibold text-blue-800 mb-2">ℹ️ Database Info</h3>
+                                        <ul className="text-sm text-blue-700 space-y-1">
+                                            <li>• Admin account is always preserved after reset</li>
+                                            <li>• All users, products, orders, payments will be deleted</li>
+                                            <li>• This action cannot be undone</li>
+                                        </ul>
+                                    </div>
+
+                                    {/* Reset Card */}
+                                    <div className="border-2 border-red-200 rounded-xl p-6 bg-red-50">
+                                        <h3 className="text-lg font-bold text-red-700 mb-2 flex items-center gap-2">
+                                            ⚠️ Danger Zone — Database Reset
+                                        </h3>
+                                        <p className="text-sm text-red-600 mb-5">
+                                            Permanently deletes <strong>all users, products, orders, payments, chats, reviews</strong> and all other data.<br />
+                                            <strong>Main admin account will be recreated automatically.</strong>
+                                        </p>
+                                        <button
+                                            type="button"
+                                            onClick={async () => {
+                                                const confirm1 = window.confirm('⚠️ WARNING: This will delete ALL data. Your admin account will be recreated. Are you sure?');
+                                                if (!confirm1) return;
+                                                const confirm2 = window.confirm('🔴 FINAL WARNING: This action CANNOT be undone. Press OK to confirm.');
+                                                if (!confirm2) return;
+                                                try {
+                                                    const res = await api.delete('/api/admin/reset-database');
+                                                    if (res.data.success) {
+                                                        toast.success('✅ Database reset! Please login again.');
+                                                        setTimeout(() => window.location.href = '/admin-login', 2000);
+                                                    }
+                                                } catch (error) {
+                                                    toast.error(error.response?.data?.message || 'Failed to reset database');
+                                                }
+                                            }}
+                                            className="bg-red-600 hover:bg-red-700 text-white font-bold px-6 py-3 rounded-xl transition-colors flex items-center gap-2"
+                                        >
+                                            🗑️ Reset Entire Database
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
                     </main>
                 </div>
             </div>
