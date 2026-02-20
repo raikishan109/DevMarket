@@ -13,11 +13,6 @@ export default function Navbar() {
         setUser(getUser());
     }, [router.pathname]);
 
-    // Close sidebar on route change
-    useEffect(() => {
-        setSidebarOpen(false);
-    }, [router.pathname]);
-
     const handleLogout = () => {
         clearAuth();
         setUser(null);
@@ -73,8 +68,8 @@ export default function Navbar() {
                                     key={link.href}
                                     href={link.href}
                                     className={`flex items-center space-x-3 px-4 py-3 rounded-xl font-medium transition-all ${router.pathname === link.href
-                                            ? 'bg-primary-100 text-primary-700 shadow-sm border-l-4 border-primary-500'
-                                            : 'text-gray-600 hover:bg-primary-50 hover:text-primary-600'
+                                        ? 'bg-primary-100 text-primary-700 shadow-sm border-l-4 border-primary-500'
+                                        : 'text-gray-600 hover:bg-primary-50 hover:text-primary-600'
                                         }`}
                                 >
                                     <span className="text-lg">{link.icon}</span>
@@ -123,7 +118,7 @@ export default function Navbar() {
 
                             {/* Dashboard Toggle Button */}
                             <button
-                                onClick={() => setSidebarOpen(!sidebarOpen)}
+                                onClick={() => { router.push('/marketplace'); setSidebarOpen(true); }}
                                 className="flex items-center space-x-2 px-4 py-2 bg-primary-50 hover:bg-primary-100 text-primary-600 rounded-xl font-medium transition-all border border-primary-200 hover:border-primary-300"
                             >
                                 <FiGrid size={18} />
