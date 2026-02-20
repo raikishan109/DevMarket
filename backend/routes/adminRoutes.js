@@ -95,7 +95,6 @@ router.get('/platform-wallet', getPlatformWallet);
 router.get('/platform-wallet/transactions', getPlatformTransactions);
 
 // ===== DATABASE RESET (Main Admin Only) =====
-const { mainAdminOnly } = require('../middleware/subAdminMiddleware');
 router.delete('/reset-database', mainAdminOnly, async (req, res) => {
     try {
         const User = require('../models/User');
