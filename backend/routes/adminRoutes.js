@@ -94,6 +94,54 @@ const { getPlatformWallet, getPlatformTransactions } = require('../controllers/a
 router.get('/platform-wallet', getPlatformWallet);
 router.get('/platform-wallet/transactions', getPlatformTransactions);
 
+// ===== DATABASE STATS =====
+router.get('/database-stats', mainAdminOnly, async (req, res) => {
+    try {
+        const User = require('../models/User');
+        const Product = require('../models/Product');
+        const Order = require('../models/Order');
+        const Payment = require('../models/Payment');
+        const Withdrawal = require('../models/Withdrawal');
+        const ChatRoom = require('../models/ChatRoom');
+        const Message = require('../models/Message');
+        const Review = require('../models/Review');
+        const Sale = require('../models/Sale');
+        const Transaction = require('../models/Transaction');
+
+        const [users, products, orders, payments, withdrawals, chatrooms, messages, reviews, sales, transactions] = await Promise.all([
+            User.find({}, 'name email role createdAt isVerified').lean(),
+            Product.find({}, 'title price status createdAt').lean(),
+            Order.find({}, 'amount status createdAt').lean(),
+            Payment.find({}, 'amount status createdAt').lean(),
+            Withdrawal.find({}, 'amount status createdAt').lean(),
+            ChatRoom.find({}, 'createdAt').lean(),
+            Message.find({}, 'content createdAt').lean(),
+            Review.find({}, 'rating comment createdAt').lean(),
+            Sale.find({}, 'amount createdAt').lean(),
+            Transaction.find({}, 'amount type description createdAt').lean(),
+        ]);
+
+        res.json({
+            success: true,
+            collections: {
+                users: { count: users.length, data: users },
+                products: { count: products.length, data: products },
+                orders: { count: orders.length, data: orders },
+                payments: { count: payments.length, data: payments },
+                withdrawals: { count: withdrawals.length, data: withdrawals },
+                chatrooms: { count: chatrooms.length, data: chatrooms },
+                messages: { count: messages.length, data: messages },
+                reviews: { count: reviews.length, data: reviews },
+                sales: { count: sales.length, data: sales },
+                transactions: { count: transactions.length, data: transactions },
+            }
+        });
+    } catch (error) {
+        console.error('DB stats error:', error);
+        res.status(500).json({ success: false, message: 'Failed to fetch database stats' });
+    }
+});
+
 // ===== DATABASE RESET (Main Admin Only) =====
 router.delete('/reset-database', mainAdminOnly, async (req, res) => {
     try {

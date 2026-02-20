@@ -6,7 +6,120 @@ import AdminLayout from '../../components/AdminLayout';
 import api from '../../utils/api';
 import { getUser } from '../../utils/auth';
 import { useToast } from '../../contexts/ToastContext';
-import { FiPackage, FiUsers, FiDollarSign, FiShoppingBag, FiCheck, FiX, FiSettings } from 'react-icons/fi';
+import { FiPackage, FiUsers, FiDollarSign, FiShoppingBag, FiCheck, FiX, FiSettings, FiRefreshCw, FiDatabase } from 'react-icons/fi';
+
+// ========= DATABASE TAB COMPONENT =========
+function DatabaseTab({ api, toast }) {
+    const [dbData, setDbData] = useState(null);
+    const [loading, setLoading] = useState(true);
+    const [activeCollection, setActiveCollection] = useState('users');
+
+    const fetchDB = async () => {
+        setLoading(true);
+        try {
+            const res = await api.get('/api/admin/database-stats');
+            if (res.data.success) setDbData(res.data.collections);
+        } catch (e) {
+            toast.error('Failed to load database');
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    useEffect(() => { fetchDB(); }, []);
+
+    const collections = dbData ? Object.entries(dbData) : [];
+
+    const handleReset = async () => {
+        const c1 = window.confirm('⚠️ WARNING: This will delete ALL data. Admin account will be recreated. Are you sure?');
+        if (!c1) return;
+        const c2 = window.confirm('🔴 FINAL WARNING: This cannot be undone. Press OK to confirm.');
+        if (!c2) return;
+        try {
+            const res = await api.delete('/api/admin/reset-database');
+            if (res.data.success) {
+                toast.success('✅ Database reset! Redirecting to login...');
+                setTimeout(() => window.location.href = '/admin-login', 2000);
+            }
+        } catch (e) {
+            toast.error(e.response?.data?.message || 'Reset failed');
+        }
+    };
+
+    if (loading) return <div className="p-8 text-center text-gray-500">Loading database...</div>;
+
+    const currentData = dbData?.[activeCollection]?.data || [];
+
+    return (
+        <div className="p-6">
+            {/* Header */}
+            <div className="flex items-center justify-between mb-6">
+                <h2 className="text-2xl font-bold text-gray-800 flex items-center gap-2">
+                    <FiDatabase className="text-gray-600" /> MongoDB Database
+                </h2>
+                <div className="flex gap-3">
+                    <button onClick={fetchDB} className="flex items-center gap-2 px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg font-medium text-sm transition-colors">
+                        <FiRefreshCw size={14} /> Refresh
+                    </button>
+                    <button onClick={handleReset} className="flex items-center gap-2 px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg font-medium text-sm transition-colors">
+                        🗑️ Reset DB
+                    </button>
+                </div>
+            </div>
+
+            {/* Collection Summary Cards */}
+            <div className="grid grid-cols-2 md:grid-cols-5 gap-3 mb-6">
+                {collections.map(([name, col]) => (
+                    <button
+                        key={name}
+                        onClick={() => setActiveCollection(name)}
+                        className={`p-3 rounded-xl border-2 text-left transition-all ${activeCollection === name ? 'border-gray-800 bg-gray-800 text-white' : 'border-gray-200 bg-white hover:border-gray-400'}`}
+                    >
+                        <div className="text-2xl font-bold">{col.count}</div>
+                        <div className="text-xs font-medium capitalize mt-1 opacity-80">{name}</div>
+                    </button>
+                ))}
+            </div>
+
+            {/* Collection Data Table */}
+            <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+                <div className="px-4 py-3 bg-gray-50 border-b border-gray-200 flex items-center justify-between">
+                    <h3 className="font-bold text-gray-700 capitalize">
+                        Collection: <span className="text-gray-900">{activeCollection}</span>
+                        <span className="ml-2 text-sm font-normal text-gray-500">({dbData?.[activeCollection]?.count || 0} records)</span>
+                    </h3>
+                </div>
+
+                {currentData.length === 0 ? (
+                    <div className="p-8 text-center text-gray-400">No records in this collection</div>
+                ) : (
+                    <div className="overflow-x-auto max-h-[500px] overflow-y-auto">
+                        <table className="min-w-full text-sm">
+                            <thead className="bg-gray-50 sticky top-0">
+                                <tr>
+                                    {Object.keys(currentData[0]).map(key => (
+                                        <th key={key} className="px-4 py-2 text-left text-xs font-semibold text-gray-600 uppercase border-b border-gray-200">{key}</th>
+                                    ))}
+                                </tr>
+                            </thead>
+                            <tbody className="divide-y divide-gray-100">
+                                {currentData.map((row, i) => (
+                                    <tr key={i} className="hover:bg-gray-50">
+                                        {Object.values(row).map((val, j) => (
+                                            <td key={j} className="px-4 py-2 text-gray-700 max-w-xs truncate">
+                                                {val instanceof Object ? JSON.stringify(val) : String(val ?? '-')}
+                                            </td>
+                                        ))}
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
+                )}
+            </div>
+        </div>
+    );
+}
 
 export default function AdminDashboard() {
     const router = useRouter();
@@ -1401,53 +1514,7 @@ export default function AdminDashboard() {
 
                         {/* ===== DATABASE TAB ===== */}
                         {activeTab === 'database' && !user?.isSubAdmin && (
-                            <div className="p-6">
-                                <h2 className="text-2xl font-bold text-gray-800 mb-6">🗄️ Database Management</h2>
-
-                                <div className="max-w-2xl space-y-6">
-                                    {/* Info Card */}
-                                    <div className="bg-blue-50 border border-blue-200 rounded-xl p-5">
-                                        <h3 className="font-semibold text-blue-800 mb-2">ℹ️ Database Info</h3>
-                                        <ul className="text-sm text-blue-700 space-y-1">
-                                            <li>• Admin account is always preserved after reset</li>
-                                            <li>• All users, products, orders, payments will be deleted</li>
-                                            <li>• This action cannot be undone</li>
-                                        </ul>
-                                    </div>
-
-                                    {/* Reset Card */}
-                                    <div className="border-2 border-red-200 rounded-xl p-6 bg-red-50">
-                                        <h3 className="text-lg font-bold text-red-700 mb-2 flex items-center gap-2">
-                                            ⚠️ Danger Zone — Database Reset
-                                        </h3>
-                                        <p className="text-sm text-red-600 mb-5">
-                                            Permanently deletes <strong>all users, products, orders, payments, chats, reviews</strong> and all other data.<br />
-                                            <strong>Main admin account will be recreated automatically.</strong>
-                                        </p>
-                                        <button
-                                            type="button"
-                                            onClick={async () => {
-                                                const confirm1 = window.confirm('⚠️ WARNING: This will delete ALL data. Your admin account will be recreated. Are you sure?');
-                                                if (!confirm1) return;
-                                                const confirm2 = window.confirm('🔴 FINAL WARNING: This action CANNOT be undone. Press OK to confirm.');
-                                                if (!confirm2) return;
-                                                try {
-                                                    const res = await api.delete('/api/admin/reset-database');
-                                                    if (res.data.success) {
-                                                        toast.success('✅ Database reset! Please login again.');
-                                                        setTimeout(() => window.location.href = '/admin-login', 2000);
-                                                    }
-                                                } catch (error) {
-                                                    toast.error(error.response?.data?.message || 'Failed to reset database');
-                                                }
-                                            }}
-                                            className="bg-red-600 hover:bg-red-700 text-white font-bold px-6 py-3 rounded-xl transition-colors flex items-center gap-2"
-                                        >
-                                            🗑️ Reset Entire Database
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
+                            <DatabaseTab api={api} toast={toast} />
                         )}
                     </main>
                 </div>
