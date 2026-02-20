@@ -28,6 +28,10 @@ app.use(cors({
 }));
 
 app.use(express.json());
+
+// Health check — for UptimeRobot to keep backend alive
+app.get('/api/health', (req, res) => res.json({ status: 'ok', time: new Date().toISOString() }));
+
 app.use(express.urlencoded({ extended: true }));
 
 /* ===========================
