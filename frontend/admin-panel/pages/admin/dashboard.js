@@ -1489,7 +1489,7 @@ export default function AdminDashboard() {
                                                     const confirm2 = window.confirm('🔴 FINAL WARNING: This action CANNOT be undone. Type OK to confirm.');
                                                     if (!confirm2) return;
                                                     try {
-                                                        const res = await api.delete('/admin/reset-database');
+                                                        const res = await api.delete('/api/admin/reset-database');
                                                         if (res.data.success) {
                                                             toast.success('✅ Database reset successfully! Admin account preserved.');
                                                             fetchData();
