@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { useState, useEffect } from 'react';
-import { FiUser, FiLogOut, FiPackage, FiHome, FiShoppingBag, FiMessageSquare, FiDollarSign, FiMonitor, FiGrid } from 'react-icons/fi';
+import { FiUser, FiLogOut, FiPackage } from 'react-icons/fi';
 import { getUser, clearAuth } from '../utils/auth';
 
 export default function Navbar() {
@@ -23,8 +23,8 @@ export default function Navbar() {
             <div className="px-4 sm:px-6 lg:px-8">
                 <div className="flex justify-between h-16 items-center">
 
-                    {/* Left: Logo + Dashboard Button */}
-                    <div className="flex items-center space-x-4">
+                    {/* Left: Logo */}
+                    <div className="flex items-center">
                         <Link href="/" className="flex items-center space-x-2">
                             <div className="w-9 h-9 bg-gradient-to-r from-primary-500 to-primary-600 rounded-lg flex items-center justify-center">
                                 <FiPackage className="text-white text-lg" />
@@ -33,14 +33,6 @@ export default function Navbar() {
                                 DevMarket
                             </span>
                         </Link>
-
-                        <button
-                            onClick={() => router.push('/marketplace')}
-                            className="flex items-center space-x-2 px-4 py-2 bg-primary-50 hover:bg-primary-100 text-primary-600 rounded-xl font-medium transition-all border border-primary-200"
-                        >
-                            <FiGrid size={18} />
-                            <span className="hidden sm:block">Dashboard</span>
-                        </button>
                     </div>
 
                     {/* Right: Profile + Logout */}
