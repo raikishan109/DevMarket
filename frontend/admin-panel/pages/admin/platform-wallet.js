@@ -47,8 +47,8 @@ export default function PlatformWallet() {
     if (loading) {
         return (
             <AdminLayout>
-                <div className="max-w-7xl mx-auto px-4 py-12">
-                    <div className="skeleton h-96"></div>
+                <div className="flex items-center justify-center h-64">
+                    <div className="w-8 h-8 border-4 border-gray-600 border-t-red-500 rounded-full animate-spin"></div>
                 </div>
             </AdminLayout>
         );
@@ -130,8 +130,8 @@ export default function PlatformWallet() {
                                             </td>
                                             <td className="px-6 py-4 whitespace-nowrap">
                                                 <span className={`px-2 py-1 rounded-full text-xs font-semibold ${transaction.type === 'credit'
-                                                        ? 'bg-green-100 text-green-800'
-                                                        : 'bg-red-100 text-red-800'
+                                                    ? 'bg-green-100 text-green-800'
+                                                    : 'bg-red-100 text-red-800'
                                                     }`}>
                                                     {transaction.type === 'credit' ? '+ Credit' : '- Debit'}
                                                 </span>
@@ -146,8 +146,8 @@ export default function PlatformWallet() {
                                             </td>
                                             <td className="px-6 py-4 whitespace-nowrap">
                                                 <span className={`text-sm font-bold ${transaction.type === 'credit'
-                                                        ? 'text-green-600'
-                                                        : 'text-red-600'
+                                                    ? 'text-green-600'
+                                                    : 'text-red-600'
                                                     }`}>
                                                     {transaction.type === 'credit' ? '+' : '-'}₹{transaction.amount?.toLocaleString()}
                                                 </span>

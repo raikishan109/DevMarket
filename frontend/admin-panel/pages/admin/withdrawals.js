@@ -75,8 +75,8 @@ export default function AdminWithdrawals() {
     if (loading) {
         return (
             <AdminLayout>
-                <div className="max-w-7xl mx-auto px-4 py-12">
-                    <div className="skeleton h-96"></div>
+                <div className="flex items-center justify-center h-64">
+                    <div className="w-8 h-8 border-4 border-gray-600 border-t-red-500 rounded-full animate-spin"></div>
                 </div>
             </AdminLayout>
         );
