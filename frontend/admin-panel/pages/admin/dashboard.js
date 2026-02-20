@@ -38,6 +38,15 @@ export default function AdminDashboard() {
         fetchData();
     }, []);
 
+    // Sync activeTab from URL query param
+    useEffect(() => {
+        if (router.query.tab) {
+            setActiveTab(router.query.tab);
+        } else if (router.isReady) {
+            setActiveTab('overview');
+        }
+    }, [router.query.tab, router.isReady]);
+
     const fetchData = async () => {
         try {
             const currentUser = getUser();
