@@ -51,10 +51,6 @@ export default function AdminLayout({ children }) {
 
     const SidebarContent = () => (
         <div className="flex flex-col h-full">
-            {/* Sidebar Header */}
-            <div className="h-16 px-4 flex items-center border-b border-gray-700 bg-gray-900 shrink-0">
-                <span className="text-red-400 font-bold text-sm uppercase tracking-wider">Admin Menu</span>
-            </div>
 
             {/* Nav Links */}
             <nav className="flex-1 py-3 px-2 space-y-0.5 overflow-y-auto">
