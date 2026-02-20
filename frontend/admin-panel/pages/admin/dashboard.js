@@ -148,7 +148,8 @@ export default function AdminDashboard() {
             return;
         }
         setUser(currentUser);
-        fetchData();
+        setLoading(false); // Show page immediately
+        fetchData();       // Fetch data in background
     }, []);
 
     // Sync activeTab from URL query param + lazy load tab data
@@ -164,21 +165,16 @@ export default function AdminDashboard() {
 
     const fetchData = async () => {
         try {
-            // Only fetch stats on initial load (fast)
-            const statsRes = await api.get('/api/admin/stats');
-            if (statsRes.data.success) setStats(statsRes.data.stats);
-
-            // Also fetch settings and pending counts (lightweight)
-            const [settingsRes, chatsRes] = await Promise.all([
+            const [statsRes, settingsRes, chatsRes] = await Promise.all([
+                api.get('/api/admin/stats'),
                 api.get('/api/admin/settings'),
                 api.get('/api/chat/admin/all'),
             ]);
+            if (statsRes.data.success) setStats(statsRes.data.stats);
             if (settingsRes.data.success) setSettings(settingsRes.data.settings);
             if (chatsRes.data.success) setActiveChatRooms(chatsRes.data.chatRooms);
         } catch (error) {
             console.error('Error fetching data:', error);
-        } finally {
-            setLoading(false);
         }
     };
 
