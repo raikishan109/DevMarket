@@ -93,7 +93,7 @@ export default function AdminLayout({ children }) {
     if (!mounted) return null;
 
     return (
-        <div className="min-h-screen bg-gray-100 flex flex-col">
+        <div className="min-h-screen bg-gray-900 flex flex-col">
             {/* Top Navbar */}
             <nav className="bg-gradient-to-r from-gray-900 to-gray-800 shadow-lg sticky top-0 z-50">
                 <div className="px-4 sm:px-6">
@@ -152,7 +152,7 @@ export default function AdminLayout({ children }) {
                 )}
 
                 {/* Main Content */}
-                <main className="flex-1 overflow-auto">
+                <main className="flex-1 overflow-auto bg-gray-800">
                     {children}
                 </main>
             </div>
