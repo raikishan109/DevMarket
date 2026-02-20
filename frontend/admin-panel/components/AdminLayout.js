@@ -35,18 +35,18 @@ export default function AdminLayout({ children }) {
     };
 
     const navLinks = [
-        { href: '/admin/dashboard', tab: 'overview', label: '📊 Overview', icon: <FiGrid /> },
-        { href: '/admin/dashboard?tab=pending', tab: 'pending', label: '⏳ Pending Products', icon: <FiPackage /> },
-        { href: '/admin/dashboard?tab=approved', tab: 'approved', label: '✅ Approved Products', icon: <FiCheckSquare /> },
-        { href: '/admin/dashboard?tab=developers', tab: 'developers', label: '👨‍💻 Developers', icon: <FiUserCheck /> },
-        { href: '/admin/dashboard?tab=users', tab: 'users', label: '👤 Users', icon: <FiUsers /> },
-        { href: '/admin/dashboard?tab=payments', tab: 'payments', label: '💳 Payments', icon: <FiCreditCard /> },
-        { href: '/admin/dashboard?tab=withdrawals', tab: 'withdrawals', label: '💸 Withdrawals', icon: <FiArrowDownCircle /> },
-        { href: '/admin/platform-wallet', tab: null, label: '💰 Platform Wallet', icon: <FiDollarSign /> },
-        { href: '/admin/dashboard?tab=reportedChats', tab: 'reportedChats', label: '🚨 Reported Chats', icon: <FiAlertCircle /> },
-        { href: '/admin/dashboard?tab=chats', tab: 'chats', label: '💬 All Chats', icon: <FiMessageSquare /> },
-        ...(!user?.isSubAdmin ? [{ href: '/admin/dashboard?tab=subAdmins', tab: 'subAdmins', label: '👥 Sub-Admins', icon: <FiUsers /> }] : []),
-        { href: '/admin/dashboard?tab=settings', tab: 'settings', label: '⚙️ Settings', icon: <FiSettings /> },
+        { href: '/admin/dashboard', tab: 'overview', label: 'Overview', icon: <FiGrid /> },
+        { href: '/admin/dashboard?tab=pending', tab: 'pending', label: 'Pending Products', icon: <FiPackage /> },
+        { href: '/admin/dashboard?tab=approved', tab: 'approved', label: 'Approved Products', icon: <FiCheckSquare /> },
+        { href: '/admin/dashboard?tab=developers', tab: 'developers', label: 'Developers', icon: <FiUserCheck /> },
+        { href: '/admin/dashboard?tab=users', tab: 'users', label: 'Users', icon: <FiUsers /> },
+        { href: '/admin/dashboard?tab=payments', tab: 'payments', label: 'Payments', icon: <FiCreditCard /> },
+        { href: '/admin/dashboard?tab=withdrawals', tab: 'withdrawals', label: 'Withdrawals', icon: <FiArrowDownCircle /> },
+        { href: '/admin/platform-wallet', tab: null, label: 'Platform Wallet', icon: <FiDollarSign /> },
+        { href: '/admin/dashboard?tab=reportedChats', tab: 'reportedChats', label: 'Reported Chats', icon: <FiAlertCircle /> },
+        { href: '/admin/dashboard?tab=chats', tab: 'chats', label: 'All Chats', icon: <FiMessageSquare /> },
+        ...(!user?.isSubAdmin ? [{ href: '/admin/dashboard?tab=subAdmins', tab: 'subAdmins', label: 'Sub-Admins', icon: <FiUsers /> }] : []),
+        { href: '/admin/dashboard?tab=settings', tab: 'settings', label: 'Settings', icon: <FiSettings /> },
     ];
 
     const SidebarContent = () => (
@@ -69,8 +69,8 @@ export default function AdminLayout({ children }) {
                             href={link.href}
                             onClick={() => setMobileOpen(false)}
                             className={`flex items-center space-x-3 px-3 py-2.5 rounded-lg font-medium transition-all text-sm ${active
-                                    ? 'bg-red-600 text-white'
-                                    : 'text-gray-400 hover:bg-gray-800 hover:text-white'
+                                ? 'bg-red-600 text-white'
+                                : 'text-gray-400 hover:bg-gray-800 hover:text-white'
                                 }`}
                         >
                             <span className="text-base shrink-0">{link.icon}</span>
