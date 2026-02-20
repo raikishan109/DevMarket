@@ -151,56 +151,69 @@ export default function AdminDashboard() {
         fetchData();
     }, []);
 
-    // Sync activeTab from URL query param
+    // Sync activeTab from URL query param + lazy load tab data
     useEffect(() => {
-        if (router.query.tab) {
-            setActiveTab(router.query.tab);
-        } else if (router.isReady) {
-            setActiveTab('overview');
+        const tab = router.query.tab || 'overview';
+        if (router.isReady) {
+            setActiveTab(tab);
+            fetchTabData(tab);
         }
     }, [router.query.tab, router.isReady]);
 
+    const [loadedTabs, setLoadedTabs] = useState({});
+
     const fetchData = async () => {
         try {
-            const currentUser = getUser();
-            const promises = [
-                api.get('/api/admin/stats'),
-                api.get('/api/admin/products/pending'),
-                api.get('/api/admin/products/approved'),
-                api.get('/api/admin/developers'),
+            // Only fetch stats on initial load (fast)
+            const statsRes = await api.get('/api/admin/stats');
+            if (statsRes.data.success) setStats(statsRes.data.stats);
+
+            // Also fetch settings and pending counts (lightweight)
+            const [settingsRes, chatsRes] = await Promise.all([
                 api.get('/api/admin/settings'),
                 api.get('/api/chat/admin/all'),
-                api.get('/api/admin/users'),
-                api.get('/api/admin/payments/pending'),
-                api.get('/api/admin/withdrawals/pending'),
-                api.get('/api/admin/payments'),
-                api.get('/api/admin/withdrawals')
-            ];
-
-            // Only fetch sub-admins if user is main admin
-            if (currentUser && !currentUser.isSubAdmin) {
-                promises.push(api.get('/api/admin/sub-admins'));
-            }
-
-            const results = await Promise.all(promises);
-            const [statsRes, pendingRes, approvedRes, devsRes, settingsRes, chatsRes, usersRes, paymentsRes, withdrawalsRes, allPaymentsRes, allWithdrawalsRes, subAdminsRes] = results;
-
-            if (statsRes.data.success) setStats(statsRes.data.stats);
-            if (pendingRes.data.success) setPendingProducts(pendingRes.data.products);
-            if (approvedRes.data.success) setApprovedProducts(approvedRes.data.products);
-            if (devsRes.data.success) setDevelopers(devsRes.data.developers);
+            ]);
             if (settingsRes.data.success) setSettings(settingsRes.data.settings);
             if (chatsRes.data.success) setActiveChatRooms(chatsRes.data.chatRooms);
-            if (usersRes.data.success) setUsers(usersRes.data.users);
-            if (paymentsRes.data.success) setPendingPayments(paymentsRes.data.payments);
-            if (withdrawalsRes.data.success) setPendingWithdrawals(withdrawalsRes.data.withdrawals);
-            if (allPaymentsRes.data.success) setAllPayments(allPaymentsRes.data.payments);
-            if (allWithdrawalsRes.data.success) setAllWithdrawals(allWithdrawalsRes.data.withdrawals);
-            if (subAdminsRes?.data.success) setSubAdmins(subAdminsRes.data.subAdmins);
         } catch (error) {
             console.error('Error fetching data:', error);
         } finally {
             setLoading(false);
+        }
+    };
+
+    // Fetch tab-specific data on demand
+    const fetchTabData = async (tab) => {
+        if (loadedTabs[tab]) return; // already loaded
+        try {
+            const currentUser = getUser();
+            if (tab === 'pending') {
+                const res = await api.get('/api/admin/products/pending');
+                if (res.data.success) setPendingProducts(res.data.products);
+            } else if (tab === 'approved') {
+                const res = await api.get('/api/admin/products/approved');
+                if (res.data.success) setApprovedProducts(res.data.products);
+            } else if (tab === 'developers') {
+                const res = await api.get('/api/admin/developers');
+                if (res.data.success) setDevelopers(res.data.developers);
+            } else if (tab === 'users') {
+                const res = await api.get('/api/admin/users');
+                if (res.data.success) setUsers(res.data.users);
+            } else if (tab === 'payments') {
+                const [p, ap] = await Promise.all([api.get('/api/admin/payments/pending'), api.get('/api/admin/payments')]);
+                if (p.data.success) setPendingPayments(p.data.payments);
+                if (ap.data.success) setAllPayments(ap.data.payments);
+            } else if (tab === 'withdrawals') {
+                const [w, aw] = await Promise.all([api.get('/api/admin/withdrawals/pending'), api.get('/api/admin/withdrawals')]);
+                if (w.data.success) setPendingWithdrawals(w.data.withdrawals);
+                if (aw.data.success) setAllWithdrawals(aw.data.withdrawals);
+            } else if (tab === 'subAdmins' && currentUser && !currentUser.isSubAdmin) {
+                const res = await api.get('/api/admin/sub-admins');
+                if (res.data.success) setSubAdmins(res.data.subAdmins);
+            }
+            setLoadedTabs(prev => ({ ...prev, [tab]: true }));
+        } catch (error) {
+            console.error(`Error fetching ${tab} data:`, error);
         }
     };
 
