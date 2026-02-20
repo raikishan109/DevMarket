@@ -90,7 +90,7 @@ export default function AdminLayout({ children }) {
         </div>
     );
 
-    if (!mounted) return null;
+    if (!mounted) return <div className="min-h-screen bg-gray-900" />;
 
     return (
         <div className="min-h-screen bg-gray-900 flex flex-col">
