@@ -107,12 +107,13 @@ router.delete('/reset-database', mainAdminOnly, async (req, res) => {
         const Review = require('../models/Review');
         const Sale = require('../models/Sale');
         const Transaction = require('../models/Transaction');
+        const bcrypt = require('bcryptjs');
 
-        // Get main admin email from env
         const adminEmail = process.env.ADMIN_EMAIL;
+        const adminPassword = process.env.ADMIN_PASSWORD;
 
-        // Delete everything EXCEPT main admin
-        await User.deleteMany({ email: { $ne: adminEmail } });
+        // Delete ALL data
+        await User.deleteMany({});
         await Product.deleteMany({});
         await Order.deleteMany({});
         await Payment.deleteMany({});
@@ -123,11 +124,24 @@ router.delete('/reset-database', mainAdminOnly, async (req, res) => {
         await Sale.deleteMany({});
         await Transaction.deleteMany({});
 
-        console.log(`✅ Database reset by admin: ${req.user.email}`);
+        // Recreate admin user immediately
+        if (adminEmail && adminPassword) {
+            const salt = await bcrypt.genSalt(10);
+            const hashedPassword = await bcrypt.hash(adminPassword, salt);
+            await User.create({
+                name: 'Admin',
+                email: adminEmail,
+                password: hashedPassword,
+                role: 'admin',
+                isVerified: true,
+                isSubAdmin: false
+            });
+            console.log(`✅ Database reset & admin recreated by: ${adminEmail}`);
+        }
 
         res.json({
             success: true,
-            message: 'Database reset successfully. Main admin account preserved.'
+            message: 'Database reset successfully. Admin account recreated.'
         });
     } catch (error) {
         console.error('Database reset error:', error);
