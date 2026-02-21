@@ -614,9 +614,8 @@ export default function Home() {
                                 ))}
                             </div>
                         </div>
-                        <div style={{ borderTop: '1px solid #1e293b', paddingTop: 24, display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 12 }}>
-                            <span style={{ fontSize: 13 }}>© 2025 DevMarket. All rights reserved.</span>
-                            <span style={{ fontSize: 13 }}>Made with ❤️ for Indian Developers</span>
+                        <div style={{ borderTop: '1px solid #1e293b', paddingTop: 24, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                            <span style={{ fontSize: 13 }}>© 2026 DevMarket. All rights reserved.</span>
                         </div>
                     </div>
                 </footer>
