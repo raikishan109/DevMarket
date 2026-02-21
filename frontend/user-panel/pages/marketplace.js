@@ -76,7 +76,7 @@ export default function Marketplace() {
     return (
         <Layout>
             <Head>
-                <title>Marketplace - DevMarket</title>
+                <title>DevMarket - Marketplace</title>
                 <meta name="description" content="Browse developer tools, AI automation, websites, and mobile apps" />
             </Head>
 
