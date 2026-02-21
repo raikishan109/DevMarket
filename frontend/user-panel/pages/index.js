@@ -85,9 +85,8 @@ export default function Home() {
                     backdropFilter: 'blur(20px)',
                     borderBottom: scrolled ? '1px solid rgba(99,102,241,0.2)' : 'none',
                     boxShadow: scrolled ? '0 4px 30px rgba(0,0,0,0.4)' : 'none',
-                    padding: '0 6%',
                 }}>
-                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', height: 70, width: '100%' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', height: 70, width: '100%', paddingLeft: 24, paddingRight: 24 }}>
                         <Link href="/" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 10 }}>
                             <div style={{
                                 width: 38, height: 38, borderRadius: 10,
