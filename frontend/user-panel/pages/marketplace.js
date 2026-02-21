@@ -33,9 +33,9 @@ function ProductCard({ product, isPurchased }) {
                 onMouseLeave={() => setHovered(false)}
                 style={{
                     background: hovered
-                        ? 'linear-gradient(135deg, rgba(99,102,241,0.12), rgba(139,92,246,0.08))'
-                        : 'rgba(15,23,42,0.7)',
-                    border: hovered ? `1px solid ${cat.color}55` : '1px solid rgba(99,102,241,0.12)',
+                        ? `linear-gradient(135deg, ${cat.color}15, rgba(17,17,28,1))`
+                        : 'rgba(13,13,20,0.97)',
+                    border: hovered ? `1px solid ${cat.color}60` : '1px solid rgba(124,58,237,0.18)',
                     borderRadius: 20,
                     padding: '24px',
                     display: 'flex',
@@ -135,8 +135,8 @@ function ProductCard({ product, isPurchased }) {
                 {/* Footer */}
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 4 }}>
                     <div>
-                        <p style={{ fontSize: 24, fontWeight: 900, color: '#818cf8', margin: 0 }}>₹{product.price}</p>
-                        <p style={{ fontSize: 11, color: '#475569', margin: 0 }}>One-time payment</p>
+                        <p style={{ fontSize: 26, fontWeight: 900, color: '#a78bfa', margin: 0 }}>₹{product.price}</p>
+                        <p style={{ fontSize: 11, color: '#6b7280', margin: 0 }}>One-time payment</p>
                     </div>
                     <div style={{
                         padding: '10px 20px', borderRadius: 12, fontSize: 13, fontWeight: 700,
@@ -225,15 +225,15 @@ export default function Marketplace() {
             {/* ── HERO ── */}
             <div style={{
                 position: 'relative', overflow: 'hidden',
-                background: '#000000',
+                background: '#0d0d14',
                 padding: '72px 5% 56px',
-                borderBottom: '1px solid rgba(99,102,241,0.15)',
+                borderBottom: '1px solid rgba(124,58,237,0.18)',
             }}>
                 {/* Floating orbs */}
                 {[
-                    { top: '-20%', left: '-5%', w: 450, h: 450, c: 'rgba(99,102,241,0.18)' },
-                    { top: '30%', right: '-8%', w: 350, h: 350, c: 'rgba(139,92,246,0.14)' },
-                    { bottom: '-30%', left: '40%', w: 300, h: 300, c: 'rgba(59,130,246,0.1)' },
+                    { top: '-20%', left: '-5%', w: 500, h: 500, c: 'rgba(124,58,237,0.20)' },
+                    { top: '30%', right: '-8%', w: 400, h: 400, c: 'rgba(139,92,246,0.16)' },
+                    { bottom: '-30%', left: '40%', w: 320, h: 320, c: 'rgba(88,28,235,0.12)' },
                 ].map((o, i) => (
                     <div key={i} style={{
                         position: 'absolute', ...o, borderRadius: '50%',
@@ -246,10 +246,10 @@ export default function Marketplace() {
                     <div style={{
                         display: 'inline-flex', alignItems: 'center', gap: 8,
                         padding: '6px 16px', borderRadius: 999, marginBottom: 20,
-                        background: 'rgba(99,102,241,0.12)', border: '1px solid rgba(99,102,241,0.3)',
+                        background: 'rgba(124,58,237,0.15)', border: '1px solid rgba(124,58,237,0.35)',
                     }}>
-                        <FiShoppingBag size={14} color="#818cf8" />
-                        <span style={{ fontSize: 13, color: '#818cf8', fontWeight: 600 }}>Developer Marketplace</span>
+                        <FiShoppingBag size={14} color="#a78bfa" />
+                        <span style={{ fontSize: 13, color: '#a78bfa', fontWeight: 600 }}>Developer Marketplace</span>
                     </div>
 
                     <h1 style={{
@@ -258,12 +258,12 @@ export default function Marketplace() {
                     }}>
                         Discover Premium{' '}
                         <span style={{
-                            background: 'linear-gradient(135deg, #818cf8, #c084fc)',
+                            background: 'linear-gradient(135deg, #a78bfa, #7c3aed)',
                             WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent',
                         }}>Dev Products</span>
                     </h1>
 
-                    <p style={{ fontSize: 17, color: '#64748b', maxWidth: 560, lineHeight: 1.7, margin: '0 0 36px' }}>
+                    <p style={{ fontSize: 17, color: '#8b8fa8', maxWidth: 560, lineHeight: 1.7, margin: '0 0 36px' }}>
                         Curated tools, automation scripts, websites & AI solutions — built by Indian developers, for developers.
                     </p>
 
@@ -275,8 +275,8 @@ export default function Marketplace() {
                             { label: 'Total Sales', value: products.reduce((s, p) => s + (p.sales || 0), 0) },
                         ].map((stat, i) => (
                             <div key={i}>
-                                <p style={{ fontSize: 28, fontWeight: 900, color: '#818cf8', margin: 0 }}>{stat.value}</p>
-                                <p style={{ fontSize: 12, color: '#475569', margin: 0, textTransform: 'uppercase', letterSpacing: '0.5px' }}>{stat.label}</p>
+                                <p style={{ fontSize: 28, fontWeight: 900, color: '#a78bfa', margin: 0 }}>{stat.value}</p>
+                                <p style={{ fontSize: 12, color: '#6b7280', margin: 0, textTransform: 'uppercase', letterSpacing: '0.5px' }}>{stat.label}</p>
                             </div>
                         ))}
                     </div>
@@ -284,7 +284,7 @@ export default function Marketplace() {
             </div>
 
             {/* ── MAIN ── */}
-            <div style={{ background: '#000000', minHeight: '60vh', padding: '40px 5% 80px' }}>
+            <div style={{ background: '#0d0d14', minHeight: '60vh', padding: '40px 5% 80px' }}>
 
                 {/* Search */}
                 <div style={{ maxWidth: 680, margin: '0 auto 32px', position: 'relative' }}>
@@ -301,11 +301,11 @@ export default function Marketplace() {
                         onBlur={() => setSearchFocused(false)}
                         style={{
                             width: '100%', padding: '16px 20px 16px 54px',
-                            background: searchFocused ? 'rgba(99,102,241,0.1)' : 'rgba(15,23,42,0.8)',
-                            border: searchFocused ? '1px solid rgba(129,140,248,0.6)' : '1px solid rgba(99,102,241,0.15)',
+                            background: searchFocused ? 'rgba(124,58,237,0.1)' : 'rgba(17,17,28,0.95)',
+                            border: searchFocused ? '1px solid rgba(124,58,237,0.55)' : '1px solid rgba(124,58,237,0.18)',
                             borderRadius: 16, color: 'white', fontSize: 15, outline: 'none',
                             boxSizing: 'border-box', transition: 'all 0.25s',
-                            boxShadow: searchFocused ? '0 0 0 4px rgba(99,102,241,0.1)' : 'none',
+                            boxShadow: searchFocused ? '0 0 0 4px rgba(124,58,237,0.12)' : 'none',
                         }}
                     />
                     {searchTerm && (
@@ -331,9 +331,9 @@ export default function Marketplace() {
                                 style={{
                                     display: 'inline-flex', alignItems: 'center', gap: 8,
                                     padding: '10px 18px', borderRadius: 999, fontSize: 13, fontWeight: 700,
-                                    background: active ? `${meta.color}22` : 'rgba(15,23,42,0.6)',
-                                    border: active ? `1px solid ${meta.color}66` : '1px solid rgba(99,102,241,0.12)',
-                                    color: active ? meta.color : '#64748b',
+                                    background: active ? `${meta.color}22` : 'rgba(17,17,28,0.8)',
+                                    border: active ? `1px solid ${meta.color}66` : '1px solid rgba(124,58,237,0.15)',
+                                    color: active ? meta.color : '#9ca3af',
                                     cursor: 'pointer',
                                     transition: 'all 0.2s',
                                     transform: active ? 'scale(1.04)' : 'scale(1)',
