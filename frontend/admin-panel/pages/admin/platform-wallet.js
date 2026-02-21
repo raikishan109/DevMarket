@@ -26,8 +26,8 @@ export default function PlatformWallet() {
     const fetchWalletData = async () => {
         try {
             const [walletRes, transactionsRes] = await Promise.all([
-                api.get('/admin/platform-wallet'),
-                api.get('/admin/platform-wallet/transactions')
+                api.get('/api/admin/platform-wallet'),
+                api.get('/api/admin/platform-wallet/transactions')
             ]);
 
             if (walletRes.data.success) {

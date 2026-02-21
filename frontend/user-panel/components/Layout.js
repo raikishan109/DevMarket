@@ -30,18 +30,18 @@ export default function Layout({ children }) {
             <Navbar />
 
             {/* Below Navbar: Sidebar + Content */}
-            <div className="flex flex-1">
+            <div className="flex flex-1 overflow-hidden">
 
-                {/* Permanent Left Sidebar */}
-                <aside className="hidden md:flex flex-col w-60 bg-white border-r border-sky-100 shadow-sm shrink-0 sticky top-16 h-[calc(100vh-64px)] overflow-y-auto">
+                {/* Permanent Left Sidebar - Fixed */}
+                <aside className="hidden md:flex flex-col w-60 bg-white border-r border-sky-100 shadow-sm shrink-0 fixed top-16 left-0 h-[calc(100vh-64px)] overflow-y-auto z-40">
                     <nav className="py-4 px-3 space-y-1">
                         {navLinks.map((link) => (
                             <Link
                                 key={link.href}
                                 href={link.href}
                                 className={`flex items-center space-x-3 px-4 py-3 rounded-xl font-medium transition-all ${router.pathname === link.href
-                                        ? 'bg-primary-100 text-primary-700 border-l-4 border-primary-500'
-                                        : 'text-gray-600 hover:bg-primary-50 hover:text-primary-600'
+                                    ? 'bg-primary-100 text-primary-700 border-l-4 border-primary-500'
+                                    : 'text-gray-600 hover:bg-primary-50 hover:text-primary-600'
                                     }`}
                             >
                                 <span className="text-lg">{link.icon}</span>
@@ -51,8 +51,8 @@ export default function Layout({ children }) {
                     </nav>
                 </aside>
 
-                {/* Main Content */}
-                <main className="flex-1 p-4 md:p-6 overflow-auto">
+                {/* Main Content - offset by sidebar width */}
+                <main className="flex-1 md:ml-60 overflow-auto h-[calc(100vh-64px)] p-4 md:p-6">
                     <div className="bg-white rounded-2xl shadow-sm min-h-full overflow-hidden">
                         {children}
                     </div>

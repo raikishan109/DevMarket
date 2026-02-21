@@ -442,8 +442,8 @@ export default function AdminDashboard() {
                     </div>
                 )}
 
-                {/* Stats */}
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6 mb-8">
+                {/* Stats - only on overview tab */}
+                {activeTab === 'overview' && <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6 mb-8">
                     <div className="card bg-gradient-to-br from-blue-500 to-blue-600 text-white">
                         <div className="flex items-center justify-between">
                             <div>
@@ -498,7 +498,7 @@ export default function AdminDashboard() {
                             </div>
                         )}
                     </div>
-                </div>
+                </div>}
 
                 {/* Main Content Area */}
                 <div className="w-full">
