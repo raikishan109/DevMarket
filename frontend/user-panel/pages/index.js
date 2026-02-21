@@ -81,10 +81,10 @@ export default function Home() {
                 <nav style={{
                     position: 'fixed', top: 0, left: 0, right: 0, zIndex: 100,
                     transition: 'all 0.3s ease',
-                    background: scrolled ? 'rgba(255,255,255,0.95)' : 'transparent',
-                    backdropFilter: scrolled ? 'blur(20px)' : 'none',
-                    borderBottom: scrolled ? '1px solid rgba(0,0,0,0.08)' : 'none',
-                    boxShadow: scrolled ? '0 4px 30px rgba(0,0,0,0.08)' : 'none',
+                    background: scrolled ? 'rgba(15,10,40,0.97)' : 'transparent',
+                    backdropFilter: 'blur(20px)',
+                    borderBottom: scrolled ? '1px solid rgba(99,102,241,0.2)' : 'none',
+                    boxShadow: scrolled ? '0 4px 30px rgba(0,0,0,0.4)' : 'none',
                     padding: '0 6%',
                 }}>
                     <div style={{ maxWidth: 1280, margin: '0 auto', display: 'flex', alignItems: 'center', justifyContent: 'space-between', height: 70 }}>
@@ -97,7 +97,7 @@ export default function Home() {
                             }}>
                                 <FiCode color="white" size={20} />
                             </div>
-                            <span style={{ fontWeight: 800, fontSize: 20, color: scrolled ? '#0f172a' : 'white', letterSpacing: '-0.5px' }}>
+                            <span style={{ fontWeight: 800, fontSize: 20, color: 'white', letterSpacing: '-0.5px' }}>
                                 Dev<span style={{ color: '#6366f1' }}>Market</span>
                             </span>
                         </Link>
@@ -105,7 +105,7 @@ export default function Home() {
                         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                             <Link href="/marketplace" style={{
                                 padding: '9px 20px', borderRadius: 8, fontWeight: 600, fontSize: 14,
-                                color: scrolled ? '#374151' : 'rgba(255,255,255,0.9)',
+                                color: '#a5b4fc',
                                 textDecoration: 'none', transition: 'all 0.2s'
                             }}>
                                 Browse
@@ -123,8 +123,8 @@ export default function Home() {
                                 <div style={{ display: 'flex', gap: 8 }}>
                                     <Link href="/login" style={{
                                         padding: '9px 20px', borderRadius: 8, fontWeight: 600, fontSize: 14,
-                                        color: scrolled ? '#374151' : 'rgba(255,255,255,0.9)',
-                                        textDecoration: 'none', border: scrolled ? '1px solid #e5e7eb' : '1px solid rgba(255,255,255,0.3)',
+                                        color: '#a5b4fc',
+                                        textDecoration: 'none', border: '1px solid rgba(99,102,241,0.3)',
                                     }}>
                                         Login
                                     </Link>

@@ -3,7 +3,7 @@ import { useRouter } from 'next/router';
 import Link from 'next/link';
 import Navbar from './Navbar';
 import Footer from './Footer';
-import { FiHome, FiShoppingBag, FiMessageSquare, FiDollarSign, FiMonitor, FiUser } from 'react-icons/fi';
+import { FiShoppingBag, FiMessageSquare, FiDollarSign, FiMonitor, FiUser } from 'react-icons/fi';
 import { getUser } from '../utils/auth';
 
 export default function Layout({ children }) {
@@ -15,7 +15,6 @@ export default function Layout({ children }) {
     }, [router.pathname]);
 
     const navLinks = [
-        { href: '/', label: 'Home', icon: <FiHome /> },
         { href: '/marketplace', label: 'Marketplace', icon: <FiShoppingBag /> },
         ...(user ? [{ href: '/chats', label: 'Chats', icon: <FiMessageSquare /> }] : []),
         ...(user?.role === 'buyer' ? [{ href: '/buyer/dashboard', label: 'My Purchases', icon: <FiMonitor /> }] : []),
