@@ -100,7 +100,9 @@ export default function Layout({ children }) {
                 </main>
             </div>
 
-            <Footer />
+            <div style={{ marginLeft: 240 }}>
+                <Footer />
+            </div>
         </div>
     );
 }
