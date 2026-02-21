@@ -87,7 +87,7 @@ export default function Home() {
                     boxShadow: scrolled ? '0 4px 30px rgba(0,0,0,0.4)' : 'none',
                     padding: '0 6%',
                 }}>
-                    <div style={{ maxWidth: 1280, margin: '0 auto', display: 'flex', alignItems: 'center', justifyContent: 'space-between', height: 70 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', height: 70, width: '100%' }}>
                         <Link href="/" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 10 }}>
                             <div style={{
                                 width: 38, height: 38, borderRadius: 10,
