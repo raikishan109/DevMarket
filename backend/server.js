@@ -13,13 +13,21 @@ const server = http.createServer(app);
    GLOBAL MIDDLEWARE
 =========================== */
 
-// ✅ SAFE CORS (Vercel + Preview + Local + Postman)
+// ✅ SAFE CORS (User Panel + Admin Panel + Vercel + Local + Postman)
+const allowedOrigins = [
+    process.env.USER_PANEL_URL,
+    process.env.ADMIN_PANEL_URL,
+].filter(Boolean);
+
 app.use(cors({
     origin: (origin, callback) => {
+        // Postman / server-to-server (no origin)
         if (!origin) return callback(null, true);
-
-        if (origin === process.env.FRONTEND_URL) return callback(null, true);
+        // Exact match from .env
+        if (allowedOrigins.includes(origin)) return callback(null, true);
+        // Any Vercel preview
         if (origin.endsWith('.vercel.app')) return callback(null, true);
+        // Localhost (any port)
         if (origin.startsWith('http://localhost')) return callback(null, true);
 
         return callback(null, true); // final safe fallback
