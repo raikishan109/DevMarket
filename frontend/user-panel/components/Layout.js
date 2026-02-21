@@ -92,17 +92,15 @@ export default function Layout({ children }) {
                         backdropFilter: 'blur(10px)',
                         borderRadius: 20,
                         border: '1px solid rgba(99,102,241,0.1)',
-                        minHeight: '100%',
+                        minHeight: 'calc(100% - 80px)',
                         overflow: 'hidden',
                     }}>
                         {children}
                     </div>
+                    <Footer />
                 </main>
             </div>
 
-            <div style={{ marginLeft: 240 }}>
-                <Footer />
-            </div>
         </div>
     );
 }
