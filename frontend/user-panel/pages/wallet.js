@@ -4,8 +4,117 @@ import Head from 'next/head';
 import Layout from '../components/Layout';
 import api from '../utils/api';
 import { getUser } from '../utils/auth';
-import { FiDollarSign, FiTrendingUp, FiTrendingDown, FiClock } from 'react-icons/fi';
+import {
+    FiDollarSign, FiTrendingUp, FiTrendingDown, FiClock,
+    FiPlus, FiArrowUpCircle, FiX, FiCopy, FiCheck,
+    FiArrowDownLeft, FiArrowUpRight, FiRefreshCw, FiShield
+} from 'react-icons/fi';
 
+const INR_TO_USDT = 88;
+const INR_TO_USDC = 88;
+
+/* ─── Small helpers ─── */
+function StatMini({ label, value, color }) {
+    return (
+        <div style={{ background: 'rgba(255,255,255,0.07)', backdropFilter: 'blur(8px)', borderRadius: 14, padding: '14px 18px', flex: 1 }}>
+            <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.55)', margin: '0 0 4px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>{label}</p>
+            <p style={{ fontSize: 20, fontWeight: 800, color: color || 'white', margin: 0 }}>{value}</p>
+        </div>
+    );
+}
+
+function DInput({ label, labelColor, ...props }) {
+    const [focused, setFocused] = useState(false);
+    const Tag = props.as === 'select' ? 'select' : 'input';
+    const { as, children, ...rest } = props;
+    return (
+        <div>
+            {label && <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: labelColor || '#818cf8', marginBottom: 8, textTransform: 'uppercase', letterSpacing: '0.5px' }}>{label}</label>}
+            <Tag
+                {...rest}
+                onFocus={() => setFocused(true)}
+                onBlur={() => setFocused(false)}
+                style={{
+                    width: '100%', padding: '13px 16px', borderRadius: 12, outline: 'none', boxSizing: 'border-box',
+                    background: 'rgba(15,23,42,0.9)', border: `1px solid ${focused ? 'rgba(129,140,248,0.6)' : 'rgba(99,102,241,0.18)'}`,
+                    color: 'white', fontSize: 14, transition: 'border-color 0.2s',
+                    boxShadow: focused ? '0 0 0 3px rgba(99,102,241,0.1)' : 'none',
+                }}
+            >{children}</Tag>
+        </div>
+    );
+}
+
+/* ─── Modal shell ─── */
+function Modal({ title, subtitle, icon, onClose, children }) {
+    return (
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.75)', backdropFilter: 'blur(6px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 999, padding: 20 }}>
+            <div style={{ background: 'linear-gradient(135deg,#0a0f1e,#0d0a2e)', border: '1px solid rgba(99,102,241,0.2)', borderRadius: 24, width: '100%', maxWidth: 520, maxHeight: '90vh', overflowY: 'auto', boxShadow: '0 32px 80px rgba(0,0,0,0.6)' }}>
+                <div style={{ padding: '28px 28px 20px', borderBottom: '1px solid rgba(99,102,241,0.1)', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+                        <div style={{ width: 44, height: 44, borderRadius: 12, background: 'rgba(99,102,241,0.15)', border: '1px solid rgba(99,102,241,0.3)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#818cf8', fontSize: 20 }}>{icon}</div>
+                        <div>
+                            <h3 style={{ fontSize: 18, fontWeight: 800, color: 'white', margin: 0 }}>{title}</h3>
+                            {subtitle && <p style={{ fontSize: 13, color: '#475569', margin: 0 }}>{subtitle}</p>}
+                        </div>
+                    </div>
+                    <button onClick={onClose} style={{ background: 'rgba(99,102,241,0.1)', border: '1px solid rgba(99,102,241,0.2)', borderRadius: 10, width: 36, height: 36, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#818cf8', cursor: 'pointer', flexShrink: 0 }}>
+                        <FiX size={16} />
+                    </button>
+                </div>
+                <div style={{ padding: '24px 28px 28px' }}>{children}</div>
+            </div>
+        </div>
+    );
+}
+
+/* ─── Payment type picker ─── */
+function PayTypePicker({ value, onChange }) {
+    const opts = [
+        { v: 'crypto', icon: '₿', label: 'Crypto', sub: 'USDT / USDC' },
+        { v: 'upi', icon: '📱', label: 'UPI', sub: 'Coming Soon', disabled: true },
+    ];
+    return (
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 20 }}>
+            {opts.map(o => (
+                <button key={o.v} type="button" disabled={o.disabled} onClick={() => !o.disabled && onChange(o.v)} style={{
+                    padding: '16px 12px', borderRadius: 14, border: `1px solid ${value === o.v ? 'rgba(129,140,248,0.5)' : 'rgba(99,102,241,0.15)'}`,
+                    background: value === o.v ? 'rgba(99,102,241,0.15)' : 'rgba(15,23,42,0.7)',
+                    color: o.disabled ? '#334155' : value === o.v ? 'white' : '#64748b',
+                    cursor: o.disabled ? 'not-allowed' : 'pointer', transition: 'all 0.2s', textAlign: 'center',
+                    transform: value === o.v ? 'scale(1.02)' : 'scale(1)',
+                }}>
+                    <div style={{ fontSize: 26, marginBottom: 6 }}>{o.icon}</div>
+                    <div style={{ fontSize: 14, fontWeight: 700 }}>{o.label}</div>
+                    <div style={{ fontSize: 11, marginTop: 3, color: o.disabled ? '#f59e0b' : value === o.v ? '#a5b4fc' : '#475569' }}>{o.sub}</div>
+                </button>
+            ))}
+        </div>
+    );
+}
+
+/* ─── Copy button ─── */
+function CopyBtn({ text }) {
+    const [copied, setCopied] = useState(false);
+    const copy = () => { navigator.clipboard.writeText(text); setCopied(true); setTimeout(() => setCopied(false), 2000); };
+    return (
+        <button type="button" onClick={copy} style={{ padding: '10px 14px', borderRadius: 10, background: copied ? 'rgba(16,185,129,0.15)' : 'rgba(99,102,241,0.15)', border: `1px solid ${copied ? 'rgba(16,185,129,0.3)' : 'rgba(99,102,241,0.25)'}`, color: copied ? '#10b981' : '#818cf8', cursor: 'pointer', flexShrink: 0, display: 'flex', alignItems: 'center', gap: 5, fontSize: 13, fontWeight: 600, transition: 'all 0.2s' }}>
+            {copied ? <><FiCheck size={13} /> Done</> : <><FiCopy size={13} /> Copy</>}
+        </button>
+    );
+}
+
+/* ─── TX category badge ─── */
+const CAT_STYLE = {
+    sale: { color: '#10b981', bg: 'rgba(16,185,129,0.12)', border: 'rgba(16,185,129,0.3)' },
+    purchase: { color: '#f59e0b', bg: 'rgba(245,158,11,0.12)', border: 'rgba(245,158,11,0.3)' },
+    deposit: { color: '#6366f1', bg: 'rgba(99,102,241,0.12)', border: 'rgba(99,102,241,0.3)' },
+    withdrawal: { color: '#ef4444', bg: 'rgba(239,68,68,0.12)', border: 'rgba(239,68,68,0.3)' },
+    commission: { color: '#8b5cf6', bg: 'rgba(139,92,246,0.12)', border: 'rgba(139,92,246,0.3)' },
+    refund: { color: '#3b82f6', bg: 'rgba(59,130,246,0.12)', border: 'rgba(59,130,246,0.3)' },
+};
+
+/* ═══════════════════════════════════════════════════ */
 export default function Wallet() {
     const router = useRouter();
     const [user, setUser] = useState(null);
@@ -23,620 +132,367 @@ export default function Wallet() {
     const [transactionHash, setTransactionHash] = useState('');
     const [upiId, setUpiId] = useState('');
     const [utrNumber, setUtrNumber] = useState('');
-    const [payments, setPayments] = useState([]);
     const [paymentSettings, setPaymentSettings] = useState({ cryptoAddresses: [], upiIds: [] });
-
-    const INR_TO_USDT_RATE = 88;
-    const INR_TO_USDC_RATE = 88;
-
-    const calculateCryptoAmount = () => {
-        if (!amount || !cryptoCoin) return 0;
-        const inrAmount = parseFloat(amount);
-        if (isNaN(inrAmount)) return 0;
-
-        if (cryptoCoin === 'USDT') {
-            return (inrAmount / INR_TO_USDT_RATE).toFixed(2);
-        } else if (cryptoCoin === 'USDC') {
-            return (inrAmount / INR_TO_USDC_RATE).toFixed(2);
-        }
-        return 0;
-    };
+    const [refreshing, setRefreshing] = useState(false);
+    const [txFilter, setTxFilter] = useState('all');
 
     useEffect(() => {
-        const currentUser = getUser();
-        if (!currentUser) {
-            router.push('/login');
-            return;
-        }
-        setUser(currentUser);
+        const u = getUser();
+        if (!u) { router.push('/login'); return; }
+        setUser(u);
         fetchWallet();
         fetchPaymentSettings();
-
-        // Auto-refresh wallet balance every 10 seconds
-        const refreshInterval = setInterval(() => {
-            fetchWallet();
-        }, 10000); // 10 seconds
-
-        // Cleanup interval on component unmount
-        return () => clearInterval(refreshInterval);
+        const t = setInterval(fetchWallet, 10000);
+        return () => clearInterval(t);
     }, []);
 
     const fetchWallet = async () => {
         try {
-            const response = await api.get('/api/wallet');
-            if (response.data.success) {
-                setBalance(response.data.balance);
-                setPlatformEarnings(response.data.platformEarnings || 0);
-                setTransactions(response.data.transactions);
+            const r = await api.get('/api/wallet');
+            if (r.data.success) {
+                setBalance(r.data.balance);
+                setPlatformEarnings(r.data.platformEarnings || 0);
+                setTransactions(r.data.transactions);
             }
-        } catch (error) {
-            console.error('Error fetching wallet:', error);
-        } finally {
-            setLoading(false);
-        }
+        } catch { } finally { setLoading(false); }
     };
 
     const fetchPaymentSettings = async () => {
         try {
-            const response = await api.get('/api/settings/payment-options');
-            if (response.data.success) {
-                setPaymentSettings({
-                    cryptoAddresses: response.data.cryptoAddresses || [],
-                    upiIds: response.data.upiIds || []
-                });
-            }
-        } catch (error) {
-            console.error('Error fetching payment settings:', error);
-        }
+            const r = await api.get('/api/settings/payment-options');
+            if (r.data.success) setPaymentSettings({ cryptoAddresses: r.data.cryptoAddresses || [], upiIds: r.data.upiIds || [] });
+        } catch { }
+    };
+
+    const resetForm = () => { setAmount(''); setPaymentType(''); setCryptoCoin(''); setCryptoNetwork(''); setTransactionHash(''); setUpiId(''); setUtrNumber(''); };
+
+    const cryptoAmt = () => {
+        const n = parseFloat(amount); if (isNaN(n)) return 0;
+        return (n / (cryptoCoin === 'USDT' ? INR_TO_USDT : INR_TO_USDC)).toFixed(4);
     };
 
     const handlePaymentSubmit = async (e) => {
-        e.preventDefault();
-        setProcessing(true);
+        e.preventDefault(); setProcessing(true);
         try {
-            const payload = {
-                amount: Number(amount),
-                paymentType
-            };
-
-            if (paymentType === 'crypto') {
-                payload.cryptoCoin = cryptoCoin;
-                payload.cryptoNetwork = cryptoNetwork;
-                payload.transactionHash = transactionHash;
-            } else if (paymentType === 'upi') {
-                payload.upiId = upiId;
-                payload.utrNumber = utrNumber;
-            }
-
-            const response = await api.post('/api/wallet/payment', payload);
-            if (response.data.success) {
-                alert(response.data.message);
-                setAmount('');
-                setPaymentType('');
-                setCryptoCoin('');
-                setCryptoNetwork('');
-                setTransactionHash('');
-                setUpiId('');
-                setUtrNumber('');
-                setShowAddMoney(false);
-                fetchWallet();
-            }
-        } catch (error) {
-            alert(error.response?.data?.message || 'Error submitting payment');
-        } finally {
-            setProcessing(false);
-        }
+            const payload = { amount: Number(amount), paymentType };
+            if (paymentType === 'crypto') { payload.cryptoCoin = cryptoCoin; payload.cryptoNetwork = cryptoNetwork; payload.transactionHash = transactionHash; }
+            else { payload.upiId = upiId; payload.utrNumber = utrNumber; }
+            const r = await api.post('/api/wallet/payment', payload);
+            if (r.data.success) { alert(r.data.message); resetForm(); setShowAddMoney(false); fetchWallet(); }
+        } catch (err) { alert(err.response?.data?.message || 'Error submitting payment'); }
+        finally { setProcessing(false); }
     };
 
     const handleWithdrawalSubmit = async (e) => {
-        e.preventDefault();
-        setProcessing(true);
+        e.preventDefault(); setProcessing(true);
         try {
-            const payload = {
-                amount: Number(amount),
-                withdrawalType: paymentType
-            };
-
-            if (paymentType === 'crypto') {
-                payload.cryptoCoin = cryptoCoin;
-                payload.cryptoNetwork = cryptoNetwork;
-                payload.walletAddress = transactionHash; // reusing field
-            } else if (paymentType === 'upi') {
-                payload.upiId = upiId;
-            }
-
-            const response = await api.post('/api/wallet/withdrawal', payload);
-            if (response.data.success) {
-                alert(response.data.message);
-                setAmount('');
-                setPaymentType('');
-                setCryptoCoin('');
-                setCryptoNetwork('');
-                setTransactionHash('');
-                setUpiId('');
-                setShowWithdraw(false);
-                fetchWallet();
-            }
-        } catch (error) {
-            alert(error.response?.data?.message || 'Error submitting withdrawal');
-        } finally {
-            setProcessing(false);
-        }
+            const payload = { amount: Number(amount), withdrawalType: paymentType };
+            if (paymentType === 'crypto') { payload.cryptoCoin = cryptoCoin; payload.cryptoNetwork = cryptoNetwork; payload.walletAddress = transactionHash; }
+            else { payload.upiId = upiId; }
+            const r = await api.post('/api/wallet/withdrawal', payload);
+            if (r.data.success) { alert(r.data.message); resetForm(); setShowWithdraw(false); fetchWallet(); }
+        } catch (err) { alert(err.response?.data?.message || 'Error submitting withdrawal'); }
+        finally { setProcessing(false); }
     };
 
-    if (loading) {
-        return (
-            <Layout>
-                <div className="max-w-6xl mx-auto px-4 py-12">
-                    <div className="skeleton h-96"></div>
-                </div>
-            </Layout>
-        );
-    }
+    const handleRefresh = async () => { setRefreshing(true); await fetchWallet(); setTimeout(() => setRefreshing(false), 600); };
 
+    const totalEarned = transactions.filter(t => t.type === 'credit').reduce((s, t) => s + t.amount, 0);
+    const totalSpent = transactions.filter(t => t.type === 'debit').reduce((s, t) => s + t.amount, 0);
+
+    const filteredTx = txFilter === 'all' ? transactions : transactions.filter(t => t.type === txFilter);
+
+    const isAdmin = user?.role === 'admin';
+    const pageTitle = isAdmin ? 'Platform Wallet' : 'My Wallet';
+
+    /* ══════════════ RENDER ══════════════ */
     return (
         <Layout>
             <Head>
-                <title>{user?.role === 'admin' ? 'Platform Wallet' : 'My Wallet'} - DevMarket</title>
+                <title>{pageTitle} – DevMarket</title>
+                <meta name="description" content="Manage your DevMarket wallet — add money, withdraw earnings and view transactions." />
             </Head>
 
-            <div className="bg-gradient-to-r from-green-600 to-teal-600 text-white py-12">
-                <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <h1 className="text-4xl font-bold mb-2">{user?.role === 'admin' ? 'Platform Wallet' : 'My Wallet'}</h1>
-                    <p className="text-green-100">Track your balance and transactions</p>
+            {/* ── HERO ── */}
+            <div style={{
+                position: 'relative', overflow: 'hidden',
+                background: 'linear-gradient(135deg, #020617 0%, #0a1628 55%, #020617 100%)',
+                padding: '60px 5% 48px',
+                borderBottom: '1px solid rgba(16,185,129,0.12)',
+            }}>
+                <div style={{ position: 'absolute', top: '-20%', right: '-5%', width: 360, height: 360, borderRadius: '50%', background: 'radial-gradient(circle, rgba(16,185,129,0.14) 0%, transparent 70%)', pointerEvents: 'none' }} />
+                <div style={{ position: 'absolute', bottom: '-40%', left: '25%', width: 280, height: 280, borderRadius: '50%', background: 'radial-gradient(circle, rgba(99,102,241,0.1) 0%, transparent 70%)', pointerEvents: 'none' }} />
+                <div style={{ position: 'relative', zIndex: 1 }}>
+                    <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8, padding: '5px 14px', borderRadius: 999, marginBottom: 18, background: 'rgba(16,185,129,0.1)', border: '1px solid rgba(16,185,129,0.25)' }}>
+                        <FiDollarSign size={13} color="#10b981" />
+                        <span style={{ fontSize: 12, color: '#10b981', fontWeight: 600 }}>{pageTitle}</span>
+                    </div>
+                    <h1 style={{ fontSize: 'clamp(28px,4vw,52px)', fontWeight: 900, color: 'white', margin: '0 0 10px', letterSpacing: '-1.5px', lineHeight: 1.1 }}>
+                        {isAdmin ? 'Platform ' : 'My '}
+                        <span style={{ background: 'linear-gradient(135deg,#10b981,#3b82f6)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>Wallet</span>
+                    </h1>
+                    <p style={{ fontSize: 15, color: '#475569', margin: 0 }}>Track your balance, add money and withdraw earnings.</p>
                 </div>
             </div>
 
-            <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-                <div className="bg-gradient-to-br from-green-500 to-teal-500 rounded-2xl shadow-2xl p-8 mb-8 text-white">
-                    <div className="flex items-center justify-between mb-6">
-                        <div className="flex-1">
-                            <p className="text-green-100 mb-2">Total Balance</p>
-                            <h2 className="text-5xl font-bold mb-4">₹{balance.toLocaleString()}</h2>
-                            <div className={`grid ${user?.role === 'admin' ? 'grid-cols-3' : 'grid-cols-2'} gap-4 mt-4`}>
-                                <div className="bg-white/10 rounded-lg p-3">
-                                    <p className="text-green-100 text-sm mb-1">Total Earnings</p>
-                                    <p className="text-2xl font-bold">
-                                        ₹{transactions
-                                            .filter(t => t.type === 'credit' && t.category === 'sale')
-                                            .reduce((sum, t) => sum + t.amount, 0)
-                                            .toLocaleString()}
-                                    </p>
-                                </div>
-                                <div className="bg-white/10 rounded-lg p-3">
-                                    <p className="text-green-100 text-sm mb-1">Total Spent</p>
-                                    <p className="text-2xl font-bold">
-                                        ₹{transactions
-                                            .filter(t => t.type === 'debit')
-                                            .reduce((sum, t) => sum + t.amount, 0)
-                                            .toLocaleString()}
-                                    </p>
-                                </div>
-                                {user?.role === 'admin' && (
-                                    <div className="bg-white/10 rounded-lg p-3">
-                                        <p className="text-green-100 text-sm mb-1">Platform Income</p>
-                                        <p className="text-2xl font-bold">
-                                            ₹{platformEarnings.toLocaleString()}
-                                        </p>
-                                    </div>
-                                )}
+            <div style={{ background: '#070c18', minHeight: '60vh', padding: '36px 5% 80px' }}>
+
+                {/* ── BALANCE CARD ── */}
+                <div style={{
+                    background: 'linear-gradient(135deg, #064e3b 0%, #0d1b4b 50%, #1e1b4b 100%)',
+                    border: '1px solid rgba(16,185,129,0.25)',
+                    borderRadius: 24, padding: '32px 36px', marginBottom: 28,
+                    position: 'relative', overflow: 'hidden',
+                    boxShadow: '0 20px 60px rgba(0,0,0,0.4)',
+                }}>
+                    {/* Bg glow */}
+                    <div style={{ position: 'absolute', top: -60, right: -60, width: 220, height: 220, borderRadius: '50%', background: 'radial-gradient(circle,rgba(16,185,129,0.25) 0%,transparent 70%)', pointerEvents: 'none' }} />
+                    <div style={{ position: 'absolute', bottom: -80, left: '30%', width: 200, height: 200, borderRadius: '50%', background: 'radial-gradient(circle,rgba(59,130,246,0.15) 0%,transparent 70%)', pointerEvents: 'none' }} />
+
+                    {/* Top row */}
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 28 }}>
+                        <div>
+                            <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.5)', margin: '0 0 8px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.5px' }}>Available Balance</p>
+                            {loading ? (
+                                <div style={{ width: 180, height: 52, borderRadius: 12, background: 'rgba(255,255,255,0.1)' }} />
+                            ) : (
+                                <p style={{ fontSize: 'clamp(36px,5vw,56px)', fontWeight: 900, color: 'white', margin: 0, lineHeight: 1, letterSpacing: '-2px' }}>
+                                    ₹{balance.toLocaleString('en-IN')}
+                                </p>
+                            )}
+                        </div>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                            <button onClick={handleRefresh} style={{ background: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,255,255,0.15)', borderRadius: 10, width: 38, height: 38, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', cursor: 'pointer' }}>
+                                <FiRefreshCw size={15} style={{ transition: 'transform 0.6s', transform: refreshing ? 'rotate(360deg)' : 'rotate(0)' }} />
+                            </button>
+                            <div style={{ width: 52, height: 52, borderRadius: 14, background: 'rgba(16,185,129,0.2)', border: '1px solid rgba(16,185,129,0.35)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#10b981', fontSize: 26 }}>
+                                <FiDollarSign />
                             </div>
                         </div>
-                        <div className="w-20 h-20 bg-white/20 rounded-full flex items-center justify-center ml-4">
-                            <FiDollarSign className="text-5xl" />
-                        </div>
                     </div>
-                    <div className="flex gap-4">
-                        <button
-                            onClick={() => setShowAddMoney(true)}
-                            className="flex-1 bg-white text-green-600 px-6 py-3 rounded-lg font-semibold hover:bg-green-50 transition-colors"
-                        >
-                            Add Money
+
+                    {/* Mini stats */}
+                    <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', marginBottom: 28 }}>
+                        <StatMini label="Total Earned" value={`₹${totalEarned.toLocaleString()}`} color="#10b981" />
+                        <StatMini label="Total Spent" value={`₹${totalSpent.toLocaleString()}`} color="#f87171" />
+                        {isAdmin && <StatMini label="Platform Income" value={`₹${platformEarnings.toLocaleString()}`} color="#818cf8" />}
+                    </div>
+
+                    {/* Action buttons */}
+                    <div style={{ display: 'flex', gap: 14 }}>
+                        <button onClick={() => { setShowAddMoney(true); resetForm(); }} style={{
+                            flex: 1, padding: '14px', borderRadius: 14, border: 'none', cursor: 'pointer',
+                            background: 'linear-gradient(135deg,#10b981,#059669)',
+                            color: 'white', fontWeight: 700, fontSize: 15,
+                            display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+                            boxShadow: '0 6px 20px rgba(16,185,129,0.35)',
+                        }}>
+                            <FiPlus size={18} /> Add Money
                         </button>
-                        <button
-                            onClick={() => setShowWithdraw(true)}
-                            className="flex-1 bg-white/20 hover:bg-white/30 px-6 py-3 rounded-lg font-semibold transition-colors"
-                        >
-                            Withdraw
+                        <button onClick={() => { setShowWithdraw(true); resetForm(); }} style={{
+                            flex: 1, padding: '14px', borderRadius: 14,
+                            background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.15)',
+                            color: 'white', fontWeight: 700, fontSize: 15, cursor: 'pointer',
+                            display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+                        }}>
+                            <FiArrowUpCircle size={18} /> Withdraw
                         </button>
                     </div>
                 </div>
 
-                {showAddMoney && (
-                    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-                        <div className="bg-white rounded-xl p-8 max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
-                            <h3 className="text-2xl font-bold mb-6">Add Money to Wallet</h3>
-
-                            <div className="grid grid-cols-2 gap-4 mb-6">
-                                <button
-                                    onClick={() => {
-                                        setPaymentType('crypto');
-                                        setCryptoCoin('');
-                                        setCryptoNetwork('');
-                                        setTransactionHash('');
-                                    }}
-                                    className={`p-4 rounded-lg border-2 transition ${paymentType === 'crypto'
-                                        ? 'border-primary-600 bg-primary-50'
-                                        : 'border-gray-300 hover:border-primary-300'
-                                        }`}
-                                >
-                                    <div className="text-center">
-                                        <div className="text-2xl mb-2">💰</div>
-                                        <div className="font-semibold">Crypto Payment</div>
-                                    </div>
-                                </button>
-                                <button
-                                    disabled
-                                    className="p-4 rounded-lg border-2 bg-gray-100 border-gray-300 cursor-not-allowed opacity-60"
-                                >
-                                    <div className="text-center">
-                                        <div className="text-2xl mb-2">📱</div>
-                                        <div className="font-semibold">UPI Payment</div>
-                                        <div className="text-xs text-yellow-600 mt-1">Coming Soon</div>
-                                    </div>
-                                </button>
-                            </div>
-
-                            <form onSubmit={handlePaymentSubmit}>
-                                <div className="mb-4">
-                                    <label className="label">Amount (₹)</label>
-                                    <input
-                                        type="number"
-                                        value={amount}
-                                        onChange={(e) => setAmount(e.target.value)}
-                                        placeholder="Enter amount"
-                                        className="input"
-                                        required
-                                        min="1"
-                                    />
-                                </div>
-
-                                {paymentType === 'crypto' && (
-                                    <>
-                                        <div className="mb-4">
-                                            <label className="label">Select Coin</label>
-                                            <select
-                                                value={cryptoCoin}
-                                                onChange={(e) => setCryptoCoin(e.target.value)}
-                                                className="input"
-                                                required
-                                            >
-                                                <option value="">Choose Coin</option>
-                                                <option value="USDT">USDT</option>
-                                                <option value="USDC">USDC</option>
-                                            </select>
-                                        </div>
-                                        {amount && cryptoCoin && (
-                                            <div className="mb-4 p-4 bg-green-50 border border-green-200 rounded-lg">
-                                                <p className="text-sm text-green-700 mb-1">Amount to pay in crypto:</p>
-                                                <p className="text-2xl font-bold text-green-900">
-                                                    {calculateCryptoAmount()} {cryptoCoin}
-                                                </p>
-                                                <p className="text-xs text-green-600 mt-1">
-                                                    Rate: ₹{cryptoCoin === 'USDT' ? INR_TO_USDT_RATE : INR_TO_USDC_RATE} per {cryptoCoin}
-                                                </p>
-                                            </div>
-                                        )}
-                                        <div className="mb-4">
-                                            <label className="label">Select Network</label>
-                                            <select
-                                                value={cryptoNetwork}
-                                                onChange={(e) => setCryptoNetwork(e.target.value)}
-                                                className="input"
-                                                required
-                                            >
-                                                <option value="">Choose Network</option>
-                                                <option value="BEP20">BEP20</option>
-                                                <option value="Polygon">Polygon</option>
-                                            </select>
-                                        </div>
-                                        {(cryptoNetwork === 'BEP20' || cryptoNetwork === 'Polygon') && (
-                                            <div className="mb-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-                                                <label className="label text-blue-900">Available Wallet Addresses</label>
-                                                {paymentSettings.cryptoAddresses && paymentSettings.cryptoAddresses.length > 0 ? (
-                                                    <div className="space-y-2">
-                                                        {paymentSettings.cryptoAddresses.map((address, index) => (
-                                                            <div key={index} className="flex items-center gap-2">
-                                                                <input
-                                                                    type="text"
-                                                                    value={address}
-                                                                    readOnly
-                                                                    className="input bg-white text-sm font-mono"
-                                                                />
-                                                                <button
-                                                                    type="button"
-                                                                    onClick={() => {
-                                                                        navigator.clipboard.writeText(address);
-                                                                        alert('Wallet address copied!');
-                                                                    }}
-                                                                    className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition whitespace-nowrap"
-                                                                >
-                                                                    Copy
-                                                                </button>
-                                                            </div>
-                                                        ))}
-                                                        <p className="text-sm text-blue-700 mt-2">Send {cryptoCoin} on {cryptoNetwork} network to any of the above addresses</p>
-                                                    </div>
-                                                ) : (
-                                                    <p className="text-sm text-yellow-700 bg-yellow-50 p-3 rounded border border-yellow-200">⚠️ No crypto addresses available. Please contact admin.</p>
-                                                )}
-                                            </div>
-                                        )}
-                                        <div className="mb-4">
-                                            <label className="label">Transaction Hash / Link</label>
-                                            <input
-                                                type="text"
-                                                value={transactionHash}
-                                                onChange={(e) => setTransactionHash(e.target.value)}
-                                                placeholder="Enter transaction hash or link"
-                                                className="input"
-                                                required
-                                            />
-                                        </div>
-                                    </>
-                                )}
-
-                                {paymentType === 'upi' && (
-                                    <>
-                                        <div className="mb-4 p-8 bg-yellow-50 border-2 border-yellow-300 rounded-lg text-center">
-                                            <div className="text-6xl mb-3">📱</div>
-                                            <p className="text-2xl font-bold text-yellow-800 mb-2">Coming Soon</p>
-                                            <p className="text-sm text-yellow-700">UPI payment feature will be available soon</p>
-                                        </div>
-                                        <div className="mb-4">
-                                            <label className="label">UPI ID</label>
-                                            <input
-                                                type="text"
-                                                value={upiId}
-                                                onChange={(e) => setUpiId(e.target.value)}
-                                                placeholder="Enter your UPI ID"
-                                                className="input"
-                                                required
-                                            />
-                                        </div>
-                                        <div className="mb-4">
-                                            <label className="label">UTR Number</label>
-                                            <input
-                                                type="text"
-                                                value={utrNumber}
-                                                onChange={(e) => setUtrNumber(e.target.value)}
-                                                placeholder="Enter UTR number"
-                                                className="input"
-                                                required
-                                            />
-                                        </div>
-                                    </>
-                                )}
-
-                                <div className="flex gap-4 mt-6">
-                                    <button
-                                        type="submit"
-                                        disabled={processing || !paymentType}
-                                        className="btn btn-primary flex-1"
-                                    >
-                                        {processing ? 'Submitting...' : 'Submit Payment'}
-                                    </button>
-                                    <button
-                                        type="button"
-                                        onClick={() => {
-                                            setShowAddMoney(false);
-                                            setAmount('');
-                                            setPaymentType('');
-                                        }}
-                                        className="btn btn-secondary flex-1"
-                                    >
-                                        Cancel
-                                    </button>
-                                </div>
-                            </form>
+                {/* ── TRANSACTIONS ── */}
+                <div style={{ background: 'rgba(10,15,30,0.85)', border: '1px solid rgba(99,102,241,0.12)', borderRadius: 20, overflow: 'hidden' }}>
+                    {/* Header */}
+                    <div style={{ padding: '20px 26px', borderBottom: '1px solid rgba(99,102,241,0.1)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 12 }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                            <FiClock color="#818cf8" />
+                            <h3 style={{ fontSize: 17, fontWeight: 800, color: 'white', margin: 0 }}>Transactions</h3>
+                            <span style={{ fontSize: 12, color: '#475569', background: 'rgba(99,102,241,0.1)', padding: '3px 10px', borderRadius: 999, border: '1px solid rgba(99,102,241,0.2)' }}>{transactions.length}</span>
+                        </div>
+                        <div style={{ display: 'flex', gap: 8 }}>
+                            {['all', 'credit', 'debit'].map(f => (
+                                <button key={f} onClick={() => setTxFilter(f)} style={{
+                                    padding: '6px 14px', borderRadius: 999, fontSize: 12, fontWeight: 700, cursor: 'pointer',
+                                    background: txFilter === f ? 'rgba(99,102,241,0.2)' : 'transparent',
+                                    border: `1px solid ${txFilter === f ? 'rgba(99,102,241,0.4)' : 'rgba(99,102,241,0.1)'}`,
+                                    color: txFilter === f ? '#818cf8' : '#475569',
+                                    transition: 'all 0.2s', textTransform: 'capitalize',
+                                }}>{f === 'all' ? 'All' : f === 'credit' ? '↑ Credits' : '↓ Debits'}</button>
+                            ))}
                         </div>
                     </div>
-                )}
 
-                {showWithdraw && (
-                    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-                        <div className="bg-white rounded-xl p-8 max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
-                            <h3 className="text-2xl font-bold mb-2">Withdraw Money</h3>
-                            <p className="text-gray-600 mb-6">Available: ₹{balance.toLocaleString()}</p>
-
-                            <div className="grid grid-cols-2 gap-4 mb-6">
-                                <button
-                                    onClick={() => {
-                                        setPaymentType('crypto');
-                                        setCryptoCoin('');
-                                        setCryptoNetwork('');
-                                        setTransactionHash('');
-                                    }}
-                                    className={`p-4 rounded-lg border-2 transition ${paymentType === 'crypto'
-                                        ? 'border-primary-600 bg-primary-50'
-                                        : 'border-gray-300 hover:border-primary-300'
-                                        }`}
-                                >
-                                    <div className="text-center">
-                                        <div className="text-2xl mb-2">💰</div>
-                                        <div className="font-semibold">Crypto Withdrawal</div>
-                                    </div>
-                                </button>
-                                <button
-                                    disabled
-                                    className="p-4 rounded-lg border-2 bg-gray-100 border-gray-300 cursor-not-allowed opacity-60"
-                                >
-                                    <div className="text-center">
-                                        <div className="text-2xl mb-2">📱</div>
-                                        <div className="font-semibold">UPI Withdrawal</div>
-                                        <div className="text-xs text-yellow-600 mt-1">Coming Soon</div>
-                                    </div>
-                                </button>
-                            </div>
-
-                            <form onSubmit={handleWithdrawalSubmit}>
-                                <div className="mb-4">
-                                    <label className="label">Amount (₹)</label>
-                                    <input
-                                        type="number"
-                                        value={amount}
-                                        onChange={(e) => setAmount(e.target.value)}
-                                        placeholder="Enter amount"
-                                        className="input"
-                                        required
-                                        min="1"
-                                        max={balance}
-                                    />
-                                </div>
-
-                                {paymentType === 'crypto' && (
-                                    <>
-                                        <div className="mb-4">
-                                            <label className="label">Select Coin</label>
-                                            <select
-                                                value={cryptoCoin}
-                                                onChange={(e) => setCryptoCoin(e.target.value)}
-                                                className="input"
-                                                required
-                                            >
-                                                <option value="">Choose Coin</option>
-                                                <option value="USDT">USDT</option>
-                                                <option value="USDC">USDC</option>
-                                            </select>
-                                        </div>
-                                        {amount && cryptoCoin && (
-                                            <div className="mb-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-                                                <p className="text-sm text-blue-700 mb-1">You will receive:</p>
-                                                <p className="text-2xl font-bold text-blue-900">
-                                                    {calculateCryptoAmount()} {cryptoCoin}
-                                                </p>
-                                                <p className="text-xs text-blue-600 mt-1">
-                                                    Rate: ₹{cryptoCoin === 'USDT' ? INR_TO_USDT_RATE : INR_TO_USDC_RATE} per {cryptoCoin}
-                                                </p>
-                                            </div>
-                                        )}
-                                        <div className="mb-4">
-                                            <label className="label">Select Network</label>
-                                            <select
-                                                value={cryptoNetwork}
-                                                onChange={(e) => setCryptoNetwork(e.target.value)}
-                                                className="input"
-                                                required
-                                            >
-                                                <option value="">Choose Network</option>
-                                                <option value="BEP20">BEP20</option>
-                                                <option value="Polygon">Polygon</option>
-                                            </select>
-                                        </div>
-                                        <div className="mb-4">
-                                            <label className="label">Your Wallet Address</label>
-                                            <input
-                                                type="text"
-                                                value={transactionHash}
-                                                onChange={(e) => setTransactionHash(e.target.value)}
-                                                placeholder="Enter your wallet address"
-                                                className="input"
-                                                required
-                                                minLength="20"
-                                            />
-                                        </div>
-                                    </>
-                                )}
-
-                                {paymentType === 'upi' && (
-                                    <>
-                                        <div className="mb-4">
-                                            <label className="label">UPI ID</label>
-                                            <input
-                                                type="text"
-                                                value={upiId}
-                                                onChange={(e) => setUpiId(e.target.value)}
-                                                placeholder="Enter your UPI ID (e.g., name@upi)"
-                                                className="input"
-                                                required
-                                                pattern="[a-zA-Z0-9.\-_]{2,256}@[a-zA-Z]{2,64}"
-                                            />
-                                        </div>
-                                    </>
-                                )}
-
-                                <div className="flex gap-4 mt-6">
-                                    <button
-                                        type="submit"
-                                        disabled={processing || !paymentType}
-                                        className="btn btn-danger flex-1"
-                                    >
-                                        {processing ? 'Submitting...' : 'Submit Withdrawal'}
-                                    </button>
-                                    <button
-                                        type="button"
-                                        onClick={() => {
-                                            setShowWithdraw(false);
-                                            setAmount('');
-                                            setPaymentType('');
-                                        }}
-                                        className="btn btn-secondary flex-1"
-                                    >
-                                        Cancel
-                                    </button>
-                                </div>
-                            </form>
+                    {/* List */}
+                    {loading ? (
+                        <div style={{ padding: 32 }}>
+                            {[1, 2, 3].map(i => (
+                                <div key={i} style={{ height: 64, borderRadius: 12, background: 'rgba(99,102,241,0.05)', marginBottom: 12 }} />
+                            ))}
                         </div>
-                    </div>
-                )}
-
-                <div className="card">
-                    <div className="flex items-center justify-between mb-6">
-                        <h3 className="text-2xl font-bold text-gray-900">Recent Transactions</h3>
-                        <FiClock className="text-gray-400 text-xl" />
-                    </div>
-
-                    {transactions.length === 0 ? (
-                        <p className="text-center text-gray-500 py-8">No transactions yet</p>
+                    ) : filteredTx.length === 0 ? (
+                        <div style={{ padding: '60px 20px', textAlign: 'center' }}>
+                            <div style={{ fontSize: 40, marginBottom: 14 }}>💸</div>
+                            <p style={{ color: '#475569', fontSize: 15 }}>{txFilter === 'all' ? 'No transactions yet' : `No ${txFilter} transactions`}</p>
+                        </div>
                     ) : (
-                        <div className="space-y-4">
-                            {transactions.map((transaction) => (
-                                <div
-                                    key={transaction._id}
-                                    className="flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
-                                >
-                                    <div className="flex items-center space-x-4">
-                                        <div className={`w-12 h-12 rounded-full flex items-center justify-center ${transaction.type === 'credit'
-                                            ? 'bg-green-100 text-green-600'
-                                            : 'bg-red-100 text-red-600'
-                                            }`}>
-                                            {transaction.type === 'credit' ? (
-                                                <FiTrendingUp className="text-xl" />
-                                            ) : (
-                                                <FiTrendingDown className="text-xl" />
-                                            )}
+                        <div>
+                            {filteredTx.map((tx, i) => {
+                                const isCredit = tx.type === 'credit';
+                                const cat = CAT_STYLE[tx.category] || CAT_STYLE['deposit'];
+                                return (
+                                    <div key={tx._id} style={{
+                                        display: 'flex', alignItems: 'center', gap: 16,
+                                        padding: '16px 26px',
+                                        borderTop: i > 0 ? '1px solid rgba(99,102,241,0.06)' : 'none',
+                                        transition: 'background 0.15s',
+                                    }}
+                                        onMouseEnter={e => e.currentTarget.style.background = 'rgba(99,102,241,0.04)'}
+                                        onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
+                                    >
+                                        {/* Icon */}
+                                        <div style={{
+                                            width: 44, height: 44, borderRadius: 12, flexShrink: 0,
+                                            background: isCredit ? 'rgba(16,185,129,0.12)' : 'rgba(239,68,68,0.12)',
+                                            border: `1px solid ${isCredit ? 'rgba(16,185,129,0.25)' : 'rgba(239,68,68,0.25)'}`,
+                                            display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                            color: isCredit ? '#10b981' : '#f87171', fontSize: 18,
+                                        }}>
+                                            {isCredit ? <FiArrowDownLeft /> : <FiArrowUpRight />}
                                         </div>
-                                        <div>
-                                            <p className="font-semibold text-gray-900">{transaction.description}</p>
-                                            <p className="text-sm text-gray-500">
-                                                {new Date(transaction.createdAt).toLocaleDateString('en-IN', {
-                                                    day: 'numeric',
-                                                    month: 'short',
-                                                    year: 'numeric',
-                                                    hour: '2-digit',
-                                                    minute: '2-digit'
-                                                })}
+
+                                        {/* Description */}
+                                        <div style={{ flex: 1, minWidth: 0 }}>
+                                            <p style={{ fontSize: 14, fontWeight: 600, color: '#e2e8f0', margin: 0, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                                                {tx.description}
+                                            </p>
+                                            <p style={{ fontSize: 12, color: '#475569', margin: '3px 0 0' }}>
+                                                {new Date(tx.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })}
                                             </p>
                                         </div>
+
+                                        {/* Right side */}
+                                        <div style={{ textAlign: 'right', flexShrink: 0 }}>
+                                            <p style={{ fontSize: 17, fontWeight: 800, color: isCredit ? '#10b981' : '#f87171', margin: '0 0 4px' }}>
+                                                {isCredit ? '+' : '−'}₹{tx.amount.toLocaleString()}
+                                            </p>
+                                            <span style={{ fontSize: 11, fontWeight: 700, color: cat.color, background: cat.bg, border: `1px solid ${cat.border}`, padding: '2px 10px', borderRadius: 999 }}>
+                                                {tx.category}
+                                            </span>
+                                        </div>
                                     </div>
-                                    <div className="text-right">
-                                        <p className={`text-xl font-bold ${transaction.type === 'credit' ? 'text-green-600' : 'text-red-600'
-                                            }`}>
-                                            {transaction.type === 'credit' ? '+' : '-'}₹{transaction.amount.toLocaleString()}
-                                        </p>
-                                        <span className={`inline-block px-2 py-1 rounded-full text-xs font-semibold ${transaction.type === 'credit'
-                                            ? 'bg-green-100 text-green-700'
-                                            : 'bg-red-100 text-red-700'
-                                            }`}>
-                                            {transaction.category}
-                                        </span>
-                                    </div>
-                                </div>
-                            ))}
+                                );
+                            })}
                         </div>
                     )}
                 </div>
             </div>
+
+            {/* ══════ ADD MONEY MODAL ══════ */}
+            {showAddMoney && (
+                <Modal title="Add Money" subtitle="Send crypto and submit transaction details" icon={<FiPlus />} onClose={() => { setShowAddMoney(false); resetForm(); }}>
+                    <PayTypePicker value={paymentType} onChange={t => { setPaymentType(t); setCryptoCoin(''); setCryptoNetwork(''); }} />
+                    <form onSubmit={handlePaymentSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+                        <DInput label="Amount (₹)" type="number" value={amount} onChange={e => setAmount(e.target.value)} placeholder="Enter INR amount" min="1" required />
+
+                        {paymentType === 'crypto' && (
+                            <>
+                                <DInput label="Select Coin" as="select" value={cryptoCoin} onChange={e => setCryptoCoin(e.target.value)} required>
+                                    <option value="" style={{ background: '#0f172a' }}>Choose coin</option>
+                                    <option value="USDT" style={{ background: '#0f172a' }}>USDT</option>
+                                    <option value="USDC" style={{ background: '#0f172a' }}>USDC</option>
+                                </DInput>
+
+                                {amount && cryptoCoin && (
+                                    <div style={{ background: 'rgba(16,185,129,0.08)', border: '1px solid rgba(16,185,129,0.2)', borderRadius: 12, padding: '14px 18px' }}>
+                                        <p style={{ fontSize: 12, color: '#10b981', margin: '0 0 4px', fontWeight: 700 }}>Amount to send in crypto</p>
+                                        <p style={{ fontSize: 24, fontWeight: 900, color: 'white', margin: 0 }}>{cryptoAmt()} <span style={{ color: '#10b981' }}>{cryptoCoin}</span></p>
+                                        <p style={{ fontSize: 11, color: '#475569', margin: '4px 0 0' }}>Rate: ₹{cryptoCoin === 'USDT' ? INR_TO_USDT : INR_TO_USDC} per {cryptoCoin}</p>
+                                    </div>
+                                )}
+
+                                <DInput label="Select Network" as="select" value={cryptoNetwork} onChange={e => setCryptoNetwork(e.target.value)} required>
+                                    <option value="" style={{ background: '#0f172a' }}>Choose network</option>
+                                    <option value="BEP20" style={{ background: '#0f172a' }}>BEP20</option>
+                                    <option value="Polygon" style={{ background: '#0f172a' }}>Polygon</option>
+                                </DInput>
+
+                                {cryptoNetwork && paymentSettings.cryptoAddresses.length > 0 && (
+                                    <div style={{ background: 'rgba(99,102,241,0.07)', border: '1px solid rgba(99,102,241,0.18)', borderRadius: 12, padding: '16px' }}>
+                                        <p style={{ fontSize: 11, fontWeight: 700, color: '#818cf8', margin: '0 0 12px', textTransform: 'uppercase' }}>
+                                            <FiShield style={{ display: 'inline', marginRight: 5 }} />Send to this address
+                                        </p>
+                                        {paymentSettings.cryptoAddresses.map((addr, i) => (
+                                            <div key={i} style={{ display: 'flex', gap: 8, marginBottom: 8 }}>
+                                                <div style={{ flex: 1, padding: '10px 14px', borderRadius: 10, background: 'rgba(15,23,42,0.8)', border: '1px solid rgba(99,102,241,0.15)', fontFamily: 'monospace', fontSize: 12, color: '#94a3b8', wordBreak: 'break-all' }}>{addr}</div>
+                                                <CopyBtn text={addr} />
+                                            </div>
+                                        ))}
+                                        <p style={{ fontSize: 12, color: '#64748b', margin: '8px 0 0' }}>Send {cryptoCoin} on {cryptoNetwork} network to the above address.</p>
+                                    </div>
+                                )}
+
+                                <DInput label="Transaction Hash / Link" type="text" value={transactionHash} onChange={e => setTransactionHash(e.target.value)} placeholder="Enter your transaction hash" required />
+                            </>
+                        )}
+
+                        <div style={{ display: 'flex', gap: 12, marginTop: 8 }}>
+                            <button type="submit" disabled={processing || !paymentType} style={{ flex: 1, padding: '14px', borderRadius: 12, border: 'none', cursor: processing || !paymentType ? 'not-allowed' : 'pointer', background: processing || !paymentType ? 'rgba(99,102,241,0.3)' : 'linear-gradient(135deg,#10b981,#059669)', color: 'white', fontWeight: 700, fontSize: 14 }}>
+                                {processing ? '⏳ Submitting...' : '✅ Submit Payment'}
+                            </button>
+                            <button type="button" onClick={() => { setShowAddMoney(false); resetForm(); }} style={{ padding: '14px 20px', borderRadius: 12, background: 'rgba(15,23,42,0.8)', border: '1px solid rgba(99,102,241,0.15)', color: '#64748b', fontWeight: 600, cursor: 'pointer' }}>
+                                Cancel
+                            </button>
+                        </div>
+                    </form>
+                </Modal>
+            )}
+
+            {/* ══════ WITHDRAW MODAL ══════ */}
+            {showWithdraw && (
+                <Modal title="Withdraw Funds" subtitle={`Available: ₹${balance.toLocaleString()}`} icon={<FiArrowUpCircle />} onClose={() => { setShowWithdraw(false); resetForm(); }}>
+                    <PayTypePicker value={paymentType} onChange={t => { setPaymentType(t); setCryptoCoin(''); setCryptoNetwork(''); }} />
+                    <form onSubmit={handleWithdrawalSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+                        <DInput label="Amount (₹)" type="number" value={amount} onChange={e => setAmount(e.target.value)} placeholder="Amount to withdraw" min="1" max={balance} required />
+
+                        {paymentType === 'crypto' && (
+                            <>
+                                <DInput label="Select Coin" as="select" value={cryptoCoin} onChange={e => setCryptoCoin(e.target.value)} required>
+                                    <option value="" style={{ background: '#0f172a' }}>Choose coin</option>
+                                    <option value="USDT" style={{ background: '#0f172a' }}>USDT</option>
+                                    <option value="USDC" style={{ background: '#0f172a' }}>USDC</option>
+                                </DInput>
+
+                                {amount && cryptoCoin && (
+                                    <div style={{ background: 'rgba(59,130,246,0.08)', border: '1px solid rgba(59,130,246,0.2)', borderRadius: 12, padding: '14px 18px' }}>
+                                        <p style={{ fontSize: 12, color: '#3b82f6', margin: '0 0 4px', fontWeight: 700 }}>You will receive</p>
+                                        <p style={{ fontSize: 24, fontWeight: 900, color: 'white', margin: 0 }}>{cryptoAmt()} <span style={{ color: '#60a5fa' }}>{cryptoCoin}</span></p>
+                                        <p style={{ fontSize: 11, color: '#475569', margin: '4px 0 0' }}>Rate: ₹{cryptoCoin === 'USDT' ? INR_TO_USDT : INR_TO_USDC} per {cryptoCoin}</p>
+                                    </div>
+                                )}
+
+                                <DInput label="Select Network" as="select" value={cryptoNetwork} onChange={e => setCryptoNetwork(e.target.value)} required>
+                                    <option value="" style={{ background: '#0f172a' }}>Choose network</option>
+                                    <option value="BEP20" style={{ background: '#0f172a' }}>BEP20</option>
+                                    <option value="Polygon" style={{ background: '#0f172a' }}>Polygon</option>
+                                </DInput>
+
+                                <DInput label="Your Wallet Address" type="text" value={transactionHash} onChange={e => setTransactionHash(e.target.value)} placeholder="Enter your crypto wallet address" required />
+                            </>
+                        )}
+
+                        <div style={{ display: 'flex', gap: 12, marginTop: 8 }}>
+                            <button type="submit" disabled={processing || !paymentType} style={{ flex: 1, padding: '14px', borderRadius: 12, border: 'none', cursor: processing || !paymentType ? 'not-allowed' : 'pointer', background: processing || !paymentType ? 'rgba(239,68,68,0.3)' : 'linear-gradient(135deg,#ef4444,#dc2626)', color: 'white', fontWeight: 700, fontSize: 14 }}>
+                                {processing ? '⏳ Submitting...' : '🏦 Submit Withdrawal'}
+                            </button>
+                            <button type="button" onClick={() => { setShowWithdraw(false); resetForm(); }} style={{ padding: '14px 20px', borderRadius: 12, background: 'rgba(15,23,42,0.8)', border: '1px solid rgba(99,102,241,0.15)', color: '#64748b', fontWeight: 600, cursor: 'pointer' }}>
+                                Cancel
+                            </button>
+                        </div>
+                    </form>
+                </Modal>
+            )}
+
+            <style>{`input::placeholder,textarea::placeholder{color:#334155} select option{background:#0f172a;color:white}`}</style>
         </Layout>
     );
 }
