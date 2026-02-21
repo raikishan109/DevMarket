@@ -225,7 +225,7 @@ export default function Marketplace() {
             {/* ── HERO ── */}
             <div style={{
                 position: 'relative', overflow: 'hidden',
-                background: 'linear-gradient(135deg, #020617 0%, #0f0c29 50%, #0d1117 100%)',
+                background: '#000000',
                 padding: '72px 5% 56px',
                 borderBottom: '1px solid rgba(99,102,241,0.15)',
             }}>
@@ -284,7 +284,7 @@ export default function Marketplace() {
             </div>
 
             {/* ── MAIN ── */}
-            <div style={{ background: '#0a0f1e', minHeight: '60vh', padding: '40px 5% 80px' }}>
+            <div style={{ background: '#000000', minHeight: '60vh', padding: '40px 5% 80px' }}>
 
                 {/* Search */}
                 <div style={{ maxWidth: 680, margin: '0 auto 32px', position: 'relative' }}>
