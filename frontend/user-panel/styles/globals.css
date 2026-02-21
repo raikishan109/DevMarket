@@ -65,7 +65,8 @@
   /* Only disable selection on interactive UI controls, not readable content */
   button,
   [role="button"],
-  nav a,
+  nav>a,
+  nav>ul a,
   .btn {
     -webkit-user-select: none;
     -moz-user-select: none;
