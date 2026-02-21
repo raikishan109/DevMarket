@@ -5,6 +5,7 @@ import Link from 'next/link';
 import Layout from '../../components/Layout';
 import api from '../../utils/api';
 import { getUser } from '../../utils/auth';
+import { useTheme } from '../../contexts/ThemeContext';
 import {
     FiShoppingBag, FiExternalLink, FiCalendar,
     FiDollarSign, FiGrid, FiPackage, FiCpu,
@@ -169,6 +170,19 @@ export default function BuyerDashboard() {
     const [purchases, setPurchases] = useState([]);
     const [loading, setLoading] = useState(true);
     const [filter, setFilter] = useState('all');
+    const { theme } = useTheme();
+    const isLight = theme === 'light';
+
+    // Theme tokens
+    const heroBg = isLight ? 'linear-gradient(135deg,#f5f3ff 0%,#ede9fe 60%,#f0f0fa 100%)' : 'linear-gradient(135deg, #020617 0%, #0d0a2e 60%, #0d1117 100%)';
+    const heroBorder = isLight ? 'rgba(99,102,241,0.18)' : 'rgba(99,102,241,0.12)';
+    const heroH1 = isLight ? '#1e1b4b' : 'white';
+    const heroDesc = isLight ? '#4b5563' : '#475569';
+    const heroName = isLight ? '#4338ca' : '#94a3b8';
+    const mainBg = isLight ? '#f0f0fa' : '#070c18';
+    const tabInactive = isLight ? 'rgba(245,243,255,0.9)' : 'rgba(10,15,30,0.7)';
+    const tabInactiveBorder = isLight ? 'rgba(99,102,241,0.2)' : 'rgba(99,102,241,0.12)';
+    const tabInactiveColor = isLight ? '#4b5563' : '#64748b';
 
     useEffect(() => {
         const currentUser = getUser();
@@ -200,9 +214,9 @@ export default function BuyerDashboard() {
             {/* ── HERO ── */}
             <div style={{
                 position: 'relative', overflow: 'hidden',
-                background: 'linear-gradient(135deg, #020617 0%, #0d0a2e 60%, #0d1117 100%)',
+                background: heroBg,
                 padding: '60px 5% 48px',
-                borderBottom: '1px solid rgba(99,102,241,0.12)',
+                borderBottom: `1px solid ${heroBorder}`,
             }}>
                 <div style={{ position: 'absolute', top: '-30%', right: '-5%', width: 400, height: 400, borderRadius: '50%', background: 'radial-gradient(circle, rgba(99,102,241,0.15) 0%, transparent 70%)', pointerEvents: 'none' }} />
                 <div style={{ position: 'absolute', bottom: '-40%', left: '30%', width: 300, height: 300, borderRadius: '50%', background: 'radial-gradient(circle, rgba(139,92,246,0.1) 0%, transparent 70%)', pointerEvents: 'none' }} />
@@ -211,19 +225,19 @@ export default function BuyerDashboard() {
                         <FiShoppingBag size={13} color="#818cf8" />
                         <span style={{ fontSize: 12, color: '#818cf8', fontWeight: 600 }}>Buyer Dashboard</span>
                     </div>
-                    <h1 style={{ fontSize: 'clamp(28px,4vw,52px)', fontWeight: 900, color: 'white', margin: '0 0 10px', letterSpacing: '-1.5px', lineHeight: 1.1 }}>
+                    <h1 style={{ fontSize: 'clamp(28px,4vw,52px)', fontWeight: 900, color: heroH1, margin: '0 0 10px', letterSpacing: '-1.5px', lineHeight: 1.1 }}>
                         My{' '}
                         <span style={{ background: 'linear-gradient(135deg,#818cf8,#c084fc)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
                             Purchases
                         </span>
                     </h1>
-                    <p style={{ fontSize: 15, color: '#475569', margin: 0 }}>
-                        Welcome back, <span style={{ color: '#94a3b8', fontWeight: 600 }}>{user?.name?.split(' ')[0]}</span> — access all your products below.
+                    <p style={{ fontSize: 15, color: heroDesc, margin: 0 }}>
+                        Welcome back, <span style={{ color: heroName, fontWeight: 600 }}>{user?.name?.split(' ')[0]}</span> — access all your products below.
                     </p>
                 </div>
             </div>
 
-            <div style={{ background: '#070c18', minHeight: '60vh', padding: '36px 5% 80px' }}>
+            <div style={{ background: mainBg, minHeight: '60vh', padding: '36px 5% 80px', transition: 'background 0.25s' }}>
 
                 {/* ── STATS ── */}
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(220px,1fr))', gap: 18, marginBottom: 36 }}>
@@ -243,9 +257,9 @@ export default function BuyerDashboard() {
                                 <button key={cat} onClick={() => setFilter(cat)} style={{
                                     display: 'inline-flex', alignItems: 'center', gap: 7,
                                     padding: '9px 16px', borderRadius: 999, cursor: 'pointer',
-                                    background: active ? `${meta.color}20` : 'rgba(10,15,30,0.7)',
-                                    border: `1px solid ${active ? meta.color + '55' : 'rgba(99,102,241,0.12)'}`,
-                                    color: active ? meta.color : '#64748b',
+                                    background: active ? `${meta.color}20` : tabInactive,
+                                    border: `1px solid ${active ? meta.color + '55' : tabInactiveBorder}`,
+                                    color: active ? meta.color : tabInactiveColor,
                                     fontWeight: 700, fontSize: 13, transition: 'all 0.2s',
                                     transform: active ? 'scale(1.04)' : 'scale(1)',
                                     boxShadow: active ? `0 4px 14px ${meta.color}30` : 'none',

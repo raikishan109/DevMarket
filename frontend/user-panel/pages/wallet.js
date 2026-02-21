@@ -4,6 +4,7 @@ import Head from 'next/head';
 import Layout from '../components/Layout';
 import api from '../utils/api';
 import { getUser } from '../utils/auth';
+import { useTheme } from '../contexts/ThemeContext';
 import {
     FiDollarSign, FiTrendingUp, FiTrendingDown, FiClock,
     FiPlus, FiArrowUpCircle, FiX, FiCopy, FiCheck,
@@ -135,6 +136,23 @@ export default function Wallet() {
     const [paymentSettings, setPaymentSettings] = useState({ cryptoAddresses: [], upiIds: [] });
     const [refreshing, setRefreshing] = useState(false);
     const [txFilter, setTxFilter] = useState('all');
+    const { theme } = useTheme();
+    const isLight = theme === 'light';
+
+    // Theme tokens
+    const heroBg = isLight ? 'linear-gradient(135deg,#ecfdf5 0%,#eff6ff 55%,#f0fdf4 100%)' : 'linear-gradient(135deg, #020617 0%, #0a1628 55%, #020617 100%)';
+    const heroBorder = isLight ? 'rgba(16,185,129,0.2)' : 'rgba(16,185,129,0.12)';
+    const heroH1 = isLight ? '#064e3b' : 'white';
+    const heroDesc = isLight ? '#374151' : '#475569';
+    const mainBg = isLight ? '#f0f0fa' : '#070c18';
+    const balCardBg = isLight ? 'linear-gradient(135deg,#d1fae5 0%,#dbeafe 50%,#ede9fe 100%)' : 'linear-gradient(135deg, #064e3b 0%, #0d1b4b 50%, #1e1b4b 100%)';
+    const balCardBorder = isLight ? 'rgba(16,185,129,0.3)' : 'rgba(16,185,129,0.25)';
+    const balCardText = isLight ? '#064e3b' : 'white';
+    const balAmtColor = isLight ? '#047857' : 'white';
+    const txCardBg = isLight ? 'rgba(255,255,255,0.9)' : 'rgba(255,255,255,0.04)';
+    const txCardBorder = isLight ? 'rgba(99,102,241,0.15)' : 'rgba(255,255,255,0.06)';
+    const txTextPrimary = isLight ? '#1e1b4b' : 'white';
+    const txTextMuted = isLight ? '#4b5563' : '#64748b';
 
     useEffect(() => {
         const u = getUser();
@@ -216,9 +234,9 @@ export default function Wallet() {
             {/* ── HERO ── */}
             <div style={{
                 position: 'relative', overflow: 'hidden',
-                background: 'linear-gradient(135deg, #020617 0%, #0a1628 55%, #020617 100%)',
+                background: heroBg,
                 padding: '60px 5% 48px',
-                borderBottom: '1px solid rgba(16,185,129,0.12)',
+                borderBottom: `1px solid ${heroBorder}`,
             }}>
                 <div style={{ position: 'absolute', top: '-20%', right: '-5%', width: 360, height: 360, borderRadius: '50%', background: 'radial-gradient(circle, rgba(16,185,129,0.14) 0%, transparent 70%)', pointerEvents: 'none' }} />
                 <div style={{ position: 'absolute', bottom: '-40%', left: '25%', width: 280, height: 280, borderRadius: '50%', background: 'radial-gradient(circle, rgba(99,102,241,0.1) 0%, transparent 70%)', pointerEvents: 'none' }} />
@@ -227,23 +245,23 @@ export default function Wallet() {
                         <FiDollarSign size={13} color="#10b981" />
                         <span style={{ fontSize: 12, color: '#10b981', fontWeight: 600 }}>{pageTitle}</span>
                     </div>
-                    <h1 style={{ fontSize: 'clamp(28px,4vw,52px)', fontWeight: 900, color: 'white', margin: '0 0 10px', letterSpacing: '-1.5px', lineHeight: 1.1 }}>
+                    <h1 style={{ fontSize: 'clamp(28px,4vw,52px)', fontWeight: 900, color: heroH1, margin: '0 0 10px', letterSpacing: '-1.5px', lineHeight: 1.1 }}>
                         {isAdmin ? 'Platform ' : 'My '}
                         <span style={{ background: 'linear-gradient(135deg,#10b981,#3b82f6)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>Wallet</span>
                     </h1>
-                    <p style={{ fontSize: 15, color: '#475569', margin: 0 }}>Track your balance, add money and withdraw earnings.</p>
+                    <p style={{ fontSize: 15, color: heroDesc, margin: 0 }}>Track your balance, add money and withdraw earnings.</p>
                 </div>
             </div>
 
-            <div style={{ background: '#070c18', minHeight: '60vh', padding: '36px 5% 80px' }}>
+            <div style={{ background: mainBg, minHeight: '60vh', padding: '36px 5% 80px', transition: 'background 0.25s' }}>
 
                 {/* ── BALANCE CARD ── */}
                 <div style={{
-                    background: 'linear-gradient(135deg, #064e3b 0%, #0d1b4b 50%, #1e1b4b 100%)',
-                    border: '1px solid rgba(16,185,129,0.25)',
+                    background: balCardBg,
+                    border: `1px solid ${balCardBorder}`,
                     borderRadius: 24, padding: '32px 36px', marginBottom: 28,
                     position: 'relative', overflow: 'hidden',
-                    boxShadow: '0 20px 60px rgba(0,0,0,0.4)',
+                    boxShadow: isLight ? '0 10px 40px rgba(16,185,129,0.15)' : '0 20px 60px rgba(0,0,0,0.4)',
                 }}>
                     {/* Bg glow */}
                     <div style={{ position: 'absolute', top: -60, right: -60, width: 220, height: 220, borderRadius: '50%', background: 'radial-gradient(circle,rgba(16,185,129,0.25) 0%,transparent 70%)', pointerEvents: 'none' }} />

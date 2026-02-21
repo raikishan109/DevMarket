@@ -6,6 +6,7 @@ import Layout from '../../components/Layout';
 import api from '../../utils/api';
 import { getUser } from '../../utils/auth';
 import { useToast } from '../../contexts/ToastContext';
+import { useTheme } from '../../contexts/ThemeContext';
 import {
     FiPlus, FiTrash2, FiDollarSign, FiPackage,
     FiTrendingUp, FiX, FiCode, FiCpu, FiZap,
@@ -152,15 +153,26 @@ export default function DeveloperDashboard() {
     const basePrice = Number(formData.price) || 0;
     const fee = (basePrice * platformCommission) / 100;
     const customerPrice = basePrice + fee;
+    const { theme } = useTheme();
+    const isLight = theme === 'light';
+
+    // Theme tokens
+    const heroBg = isLight ? 'linear-gradient(135deg,#f5f3ff 0%,#ede9fe 60%,#f0f0fa 100%)' : 'linear-gradient(135deg, #020617 0%, #0d0a2e 60%, #0d1117 100%)';
+    const heroBorder = isLight ? 'rgba(99,102,241,0.18)' : 'rgba(99,102,241,0.12)';
+    const heroH1 = isLight ? '#1e1b4b' : 'white';
+    const heroDesc = isLight ? '#4b5563' : '#475569';
+    const mainBg = isLight ? '#f0f0fa' : '#070c18';
+    const inputBg = isLight ? 'rgba(255,255,255,0.9)' : 'rgba(15,23,42,0.8)';
+    const inputColor = isLight ? '#1e1b4b' : 'white';
 
     const s = {
-        page: { background: '#070c18', minHeight: '100vh' },
+        page: { background: mainBg, minHeight: '100vh', transition: 'background 0.25s' },
         section: { padding: '0 5% 80px' },
         label: { display: 'block', fontSize: 12, fontWeight: 700, color: '#818cf8', marginBottom: 8, textTransform: 'uppercase', letterSpacing: '0.5px' },
         input: (focused) => ({
             width: '100%', padding: '13px 16px', borderRadius: 12, outline: 'none', boxSizing: 'border-box',
-            background: 'rgba(15,23,42,0.8)', border: `1px solid ${focused ? 'rgba(129,140,248,0.6)' : 'rgba(99,102,241,0.15)'}`,
-            color: 'white', fontSize: 14,
+            background: inputBg, border: `1px solid ${focused ? 'rgba(129,140,248,0.6)' : 'rgba(99,102,241,0.15)'}`,
+            color: inputColor, fontSize: 14,
             transition: 'border-color 0.2s',
             boxShadow: focused ? '0 0 0 3px rgba(99,102,241,0.1)' : 'none',
         }),
@@ -191,9 +203,9 @@ export default function DeveloperDashboard() {
             {/* ── HERO ── */}
             <div style={{
                 position: 'relative', overflow: 'hidden',
-                background: 'linear-gradient(135deg, #020617 0%, #0d0a2e 60%, #0d1117 100%)',
+                background: heroBg,
                 padding: '60px 5% 48px',
-                borderBottom: '1px solid rgba(99,102,241,0.12)',
+                borderBottom: `1px solid ${heroBorder}`,
             }}>
                 <div style={{ position: 'absolute', top: '-30%', right: '-5%', width: 400, height: 400, borderRadius: '50%', background: 'radial-gradient(circle, rgba(99,102,241,0.15) 0%, transparent 70%)', pointerEvents: 'none' }} />
                 <div style={{ position: 'absolute', bottom: '-40%', left: '30%', width: 300, height: 300, borderRadius: '50%', background: 'radial-gradient(circle, rgba(139,92,246,0.1) 0%, transparent 70%)', pointerEvents: 'none' }} />
@@ -202,13 +214,13 @@ export default function DeveloperDashboard() {
                         <FiCode size={13} color="#818cf8" />
                         <span style={{ fontSize: 12, color: '#818cf8', fontWeight: 600 }}>Developer Console</span>
                     </div>
-                    <h1 style={{ fontSize: 'clamp(28px,4vw,52px)', fontWeight: 900, color: 'white', margin: '0 0 10px', letterSpacing: '-1.5px', lineHeight: 1.1 }}>
+                    <h1 style={{ fontSize: 'clamp(28px,4vw,52px)', fontWeight: 900, color: heroH1, margin: '0 0 10px', letterSpacing: '-1.5px', lineHeight: 1.1 }}>
                         Welcome back,{' '}
                         <span style={{ background: 'linear-gradient(135deg,#818cf8,#c084fc)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
                             {user?.name?.split(' ')[0] || 'Developer'}
                         </span>
                     </h1>
-                    <p style={{ fontSize: 15, color: '#475569', margin: 0 }}>Manage your products, track earnings and monitor performance.</p>
+                    <p style={{ fontSize: 15, color: heroDesc, margin: 0 }}>Manage your products, track earnings and monitor performance.</p>
                 </div>
             </div>
 

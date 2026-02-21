@@ -3,6 +3,7 @@ import Head from 'next/head';
 import Link from 'next/link';
 import Layout from '../components/Layout';
 import api from '../utils/api';
+import { useTheme } from '../contexts/ThemeContext';
 import { FiSearch, FiStar, FiPackage, FiZap, FiCode, FiSmartphone, FiGlobe, FiCpu, FiGrid, FiShoppingBag } from 'react-icons/fi';
 
 const CATEGORY_META = {
@@ -169,6 +170,27 @@ export default function Marketplace() {
     const [sortBy, setSortBy] = useState('newest');
     const [purchasedProductIds, setPurchasedProductIds] = useState([]);
     const [searchFocused, setSearchFocused] = useState(false);
+    const { theme } = useTheme();
+    const isLight = theme === 'light';
+
+    // Theme tokens
+    const heroBg = isLight ? 'linear-gradient(135deg,#f5f3ff 0%,#ede9fe 60%,#f0f0fa 100%)' : '#0d0d14';
+    const mainBg = isLight ? '#f0f0fa' : '#0d0d14';
+    const heroBorder = isLight ? 'rgba(124,58,237,0.15)' : 'rgba(124,58,237,0.18)';
+    const badgeBg = isLight ? 'rgba(124,58,237,0.1)' : 'rgba(124,58,237,0.15)';
+    const badgeBorder = isLight ? 'rgba(124,58,237,0.3)' : 'rgba(124,58,237,0.35)';
+    const badgeColor = isLight ? '#6d28d9' : '#a78bfa';
+    const h1Color = isLight ? '#1e1b4b' : 'white';
+    const descColor = isLight ? '#4b5563' : '#8b8fa8';
+    const statsNumColor = isLight ? '#6d28d9' : '#a78bfa';
+    const statsLabelColor = isLight ? '#6b7280' : '#6b7280';
+    const searchBg = isLight ? (searchFocused ? 'rgba(124,58,237,0.06)' : 'rgba(255,255,255,0.95)') : (searchFocused ? 'rgba(124,58,237,0.1)' : 'rgba(17,17,28,0.95)');
+    const searchBorder = isLight ? (searchFocused ? 'rgba(124,58,237,0.5)' : 'rgba(124,58,237,0.2)') : (searchFocused ? 'rgba(124,58,237,0.55)' : 'rgba(124,58,237,0.18)');
+    const searchColor = isLight ? '#1e1b4b' : 'white';
+    const tabBg = isLight ? 'rgba(245,243,255,0.9)' : 'rgba(17,17,28,0.8)';
+    const tabBgBorder = isLight ? 'rgba(124,58,237,0.18)' : 'rgba(124,58,237,0.15)';
+    const tabColor = isLight ? '#6b7280' : '#9ca3af';
+    const toolbarColor = isLight ? '#374151' : '#94a3b8';
 
     useEffect(() => {
         (async () => {
@@ -225,9 +247,9 @@ export default function Marketplace() {
             {/* ── HERO ── */}
             <div style={{
                 position: 'relative', overflow: 'hidden',
-                background: '#0d0d14',
+                background: heroBg,
                 padding: '72px 5% 56px',
-                borderBottom: '1px solid rgba(124,58,237,0.18)',
+                borderBottom: `1px solid ${heroBorder}`,
             }}>
                 {/* Floating orbs */}
                 {[
@@ -246,14 +268,14 @@ export default function Marketplace() {
                     <div style={{
                         display: 'inline-flex', alignItems: 'center', gap: 8,
                         padding: '6px 16px', borderRadius: 999, marginBottom: 20,
-                        background: 'rgba(124,58,237,0.15)', border: '1px solid rgba(124,58,237,0.35)',
+                        background: badgeBg, border: `1px solid ${badgeBorder}`,
                     }}>
-                        <FiShoppingBag size={14} color="#a78bfa" />
-                        <span style={{ fontSize: 13, color: '#a78bfa', fontWeight: 600 }}>Developer Marketplace</span>
+                        <FiShoppingBag size={14} color={badgeColor} />
+                        <span style={{ fontSize: 13, color: badgeColor, fontWeight: 600 }}>Developer Marketplace</span>
                     </div>
 
                     <h1 style={{
-                        fontSize: 'clamp(32px, 5vw, 60px)', fontWeight: 900, color: 'white',
+                        fontSize: 'clamp(32px, 5vw, 60px)', fontWeight: 900, color: h1Color,
                         lineHeight: 1.1, margin: '0 0 16px', letterSpacing: '-2px',
                     }}>
                         Discover Premium{' '}
@@ -263,7 +285,7 @@ export default function Marketplace() {
                         }}>Dev Products</span>
                     </h1>
 
-                    <p style={{ fontSize: 17, color: '#8b8fa8', maxWidth: 560, lineHeight: 1.7, margin: '0 0 36px' }}>
+                    <p style={{ fontSize: 17, color: descColor, maxWidth: 560, lineHeight: 1.7, margin: '0 0 36px' }}>
                         Curated tools, automation scripts, websites & AI solutions — built by Indian developers, for developers.
                     </p>
 
@@ -275,8 +297,8 @@ export default function Marketplace() {
                             { label: 'Total Sales', value: products.reduce((s, p) => s + (p.sales || 0), 0) },
                         ].map((stat, i) => (
                             <div key={i}>
-                                <p style={{ fontSize: 28, fontWeight: 900, color: '#a78bfa', margin: 0 }}>{stat.value}</p>
-                                <p style={{ fontSize: 12, color: '#6b7280', margin: 0, textTransform: 'uppercase', letterSpacing: '0.5px' }}>{stat.label}</p>
+                                <p style={{ fontSize: 28, fontWeight: 900, color: statsNumColor, margin: 0 }}>{stat.value}</p>
+                                <p style={{ fontSize: 12, color: statsLabelColor, margin: 0, textTransform: 'uppercase', letterSpacing: '0.5px' }}>{stat.label}</p>
                             </div>
                         ))}
                     </div>
@@ -284,7 +306,7 @@ export default function Marketplace() {
             </div>
 
             {/* ── MAIN ── */}
-            <div style={{ background: '#0d0d14', minHeight: '60vh', padding: '40px 5% 80px' }}>
+            <div style={{ background: mainBg, minHeight: '60vh', padding: '40px 5% 80px', transition: 'background 0.25s' }}>
 
                 {/* Search */}
                 <div style={{ maxWidth: 680, margin: '0 auto 32px', position: 'relative' }}>
@@ -301,9 +323,9 @@ export default function Marketplace() {
                         onBlur={() => setSearchFocused(false)}
                         style={{
                             width: '100%', padding: '16px 20px 16px 54px',
-                            background: searchFocused ? 'rgba(124,58,237,0.1)' : 'rgba(17,17,28,0.95)',
-                            border: searchFocused ? '1px solid rgba(124,58,237,0.55)' : '1px solid rgba(124,58,237,0.18)',
-                            borderRadius: 16, color: 'white', fontSize: 15, outline: 'none',
+                            background: searchBg,
+                            border: `1px solid ${searchBorder}`,
+                            borderRadius: 16, color: searchColor, fontSize: 15, outline: 'none',
                             boxSizing: 'border-box', transition: 'all 0.25s',
                             boxShadow: searchFocused ? '0 0 0 4px rgba(124,58,237,0.12)' : 'none',
                         }}
@@ -331,9 +353,9 @@ export default function Marketplace() {
                                 style={{
                                     display: 'inline-flex', alignItems: 'center', gap: 8,
                                     padding: '10px 18px', borderRadius: 999, fontSize: 13, fontWeight: 700,
-                                    background: active ? `${meta.color}22` : 'rgba(17,17,28,0.8)',
-                                    border: active ? `1px solid ${meta.color}66` : '1px solid rgba(124,58,237,0.15)',
-                                    color: active ? meta.color : '#9ca3af',
+                                    background: active ? `${meta.color}22` : tabBg,
+                                    border: active ? `1px solid ${meta.color}66` : `1px solid ${tabBgBorder}`,
+                                    color: active ? meta.color : tabColor,
                                     cursor: 'pointer',
                                     transition: 'all 0.2s',
                                     transform: active ? 'scale(1.04)' : 'scale(1)',
