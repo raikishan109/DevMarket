@@ -34,7 +34,7 @@ export default function Navbar() {
             boxShadow: scrolled ? '0 4px 30px rgba(0,0,0,0.3)' : 'none',
             transition: 'all 0.3s ease',
         }}>
-            <div style={{ maxWidth: 1280, margin: '0 auto', padding: '0 24px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', height: 64 }}>
+            <div style={{ padding: '0 24px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', height: 64 }}>
 
                 {/* Logo */}
                 <Link href="/" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 10 }}>
