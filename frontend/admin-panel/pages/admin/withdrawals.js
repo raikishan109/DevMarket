@@ -16,7 +16,7 @@ export default function AdminWithdrawals() {
     useEffect(() => {
         const currentUser = getUser();
         if (!currentUser || currentUser.role !== 'admin') {
-            router.push('/login');
+            router.push('/admin-login');
             return;
         }
         setUser(currentUser);

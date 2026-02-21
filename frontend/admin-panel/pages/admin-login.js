@@ -122,7 +122,7 @@ export default function AdminLogin() {
 
                         {/* Footer */}
                         <div className="mt-6 pt-6 border-t border-gray-700 text-center">
-                            <Link href="/login" className="text-gray-400 hover:text-white transition-colors text-sm">
+                            <Link href="/admin-login" className="text-gray-400 hover:text-white transition-colors text-sm">
                                 ← Back to User Login
                             </Link>
                         </div>
