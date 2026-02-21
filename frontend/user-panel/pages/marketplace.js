@@ -26,6 +26,29 @@ const SORT_OPTIONS = [
 function ProductCard({ product, isPurchased }) {
     const [hovered, setHovered] = useState(false);
     const cat = CATEGORY_META[product.category] || CATEGORY_META['Other'];
+    const { theme } = useTheme();
+    const isLight = theme === 'light';
+
+    // Card theme tokens
+    const cardBg = isLight
+        ? (hovered ? `linear-gradient(135deg, ${cat.color}12, rgba(255,255,255,1))` : 'rgba(255,255,255,0.95)')
+        : (hovered ? `linear-gradient(135deg, ${cat.color}15, rgba(17,17,28,1))` : 'rgba(13,13,20,0.97)');
+    const cardBorder = hovered ? `1px solid ${cat.color}60` : (isLight ? '1px solid rgba(124,58,237,0.18)' : '1px solid rgba(124,58,237,0.18)');
+    const cardShadow = hovered
+        ? (isLight ? `0 20px 40px rgba(0,0,0,0.12), 0 0 0 1px ${cat.color}33` : `0 20px 40px rgba(0,0,0,0.4), 0 0 0 1px ${cat.color}33`)
+        : (isLight ? '0 4px 16px rgba(0,0,0,0.06)' : '0 4px 16px rgba(0,0,0,0.2)');
+    const titleColor = isLight ? '#1e1b4b' : '#f1f5f9';
+    const probBg = isLight ? 'rgba(239,68,68,0.06)' : 'rgba(239,68,68,0.06)';
+    const probBorder = isLight ? '1px solid rgba(239,68,68,0.2)' : '1px solid rgba(239,68,68,0.15)';
+    const probLabel = '#f87171';
+    const probText = isLight ? '#374151' : '#94a3b8';
+    const solBg = isLight ? 'rgba(16,185,129,0.06)' : 'rgba(16,185,129,0.06)';
+    const solBorder = isLight ? '1px solid rgba(16,185,129,0.2)' : '1px solid rgba(16,185,129,0.15)';
+    const solLabel = '#34d399';
+    const solText = isLight ? '#374151' : '#94a3b8';
+    const priceColor = '#a78bfa';
+    const priceSubColor = isLight ? '#4b5563' : '#6b7280';
+    const salesColor = isLight ? '#4b5563' : '#475569';
 
     return (
         <Link href={`/products/${product._id}`}>
@@ -33,10 +56,8 @@ function ProductCard({ product, isPurchased }) {
                 onMouseEnter={() => setHovered(true)}
                 onMouseLeave={() => setHovered(false)}
                 style={{
-                    background: hovered
-                        ? `linear-gradient(135deg, ${cat.color}15, rgba(17,17,28,1))`
-                        : 'rgba(13,13,20,0.97)',
-                    border: hovered ? `1px solid ${cat.color}60` : '1px solid rgba(124,58,237,0.18)',
+                    background: cardBg,
+                    border: cardBorder,
                     borderRadius: 20,
                     padding: '24px',
                     display: 'flex',
@@ -44,7 +65,7 @@ function ProductCard({ product, isPurchased }) {
                     gap: 14,
                     transition: 'all 0.3s cubic-bezier(0.4,0,0.2,1)',
                     transform: hovered ? 'translateY(-6px)' : 'translateY(0)',
-                    boxShadow: hovered ? `0 20px 40px rgba(0,0,0,0.4), 0 0 0 1px ${cat.color}33` : '0 4px 16px rgba(0,0,0,0.2)',
+                    boxShadow: cardShadow,
                     cursor: 'pointer',
                     backdropFilter: 'blur(12px)',
                     height: '100%',
@@ -97,7 +118,7 @@ function ProductCard({ product, isPurchased }) {
 
                 {/* Title */}
                 <h3 style={{
-                    fontSize: 18, fontWeight: 800, color: '#f1f5f9',
+                    fontSize: 18, fontWeight: 800, color: titleColor,
                     lineHeight: 1.3, margin: 0,
                     display: '-webkit-box', WebkitLineClamp: 2,
                     WebkitBoxOrient: 'vertical', overflow: 'hidden',
@@ -107,12 +128,12 @@ function ProductCard({ product, isPurchased }) {
 
                 {/* Problem */}
                 <div style={{
-                    background: 'rgba(239,68,68,0.06)', border: '1px solid rgba(239,68,68,0.15)',
+                    background: probBg, border: probBorder,
                     borderRadius: 10, padding: '10px 14px',
                 }}>
-                    <p style={{ fontSize: 11, fontWeight: 700, color: '#f87171', marginBottom: 4, letterSpacing: '0.5px', textTransform: 'uppercase' }}>Problem</p>
+                    <p style={{ fontSize: 11, fontWeight: 700, color: probLabel, marginBottom: 4, letterSpacing: '0.5px', textTransform: 'uppercase' }}>Problem</p>
                     <p style={{
-                        fontSize: 13, color: '#94a3b8', lineHeight: 1.5, margin: 0,
+                        fontSize: 13, color: probText, lineHeight: 1.5, margin: 0,
                         display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden'
                     }}>
                         {product.problemSolved}
@@ -121,12 +142,12 @@ function ProductCard({ product, isPurchased }) {
 
                 {/* Solution */}
                 <div style={{
-                    background: 'rgba(16,185,129,0.06)', border: '1px solid rgba(16,185,129,0.15)',
+                    background: solBg, border: solBorder,
                     borderRadius: 10, padding: '10px 14px', flexGrow: 1,
                 }}>
-                    <p style={{ fontSize: 11, fontWeight: 700, color: '#34d399', marginBottom: 4, letterSpacing: '0.5px', textTransform: 'uppercase' }}>Solution</p>
+                    <p style={{ fontSize: 11, fontWeight: 700, color: solLabel, marginBottom: 4, letterSpacing: '0.5px', textTransform: 'uppercase' }}>Solution</p>
                     <p style={{
-                        fontSize: 13, color: '#94a3b8', lineHeight: 1.5, margin: 0,
+                        fontSize: 13, color: solText, lineHeight: 1.5, margin: 0,
                         display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden'
                     }}>
                         {product.solution}
@@ -136,8 +157,8 @@ function ProductCard({ product, isPurchased }) {
                 {/* Footer */}
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 4 }}>
                     <div>
-                        <p style={{ fontSize: 26, fontWeight: 900, color: '#a78bfa', margin: 0 }}>₹{product.price}</p>
-                        <p style={{ fontSize: 11, color: '#6b7280', margin: 0 }}>One-time payment</p>
+                        <p style={{ fontSize: 26, fontWeight: 900, color: priceColor, margin: 0 }}>₹{product.price}</p>
+                        <p style={{ fontSize: 11, color: priceSubColor, margin: 0 }}>One-time payment</p>
                     </div>
                     <div style={{
                         padding: '10px 20px', borderRadius: 12, fontSize: 13, fontWeight: 700,
@@ -152,7 +173,7 @@ function ProductCard({ product, isPurchased }) {
                 </div>
 
                 {product.sales > 0 && (
-                    <p style={{ fontSize: 11, color: '#475569', margin: 0, textAlign: 'right' }}>
+                    <p style={{ fontSize: 11, color: salesColor, margin: 0, textAlign: 'right' }}>
                         🔥 {product.sales} {product.sales === 1 ? 'sale' : 'sales'}
                     </p>
                 )}
