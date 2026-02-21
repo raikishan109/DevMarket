@@ -22,6 +22,21 @@ export default function Layout({ children }) {
         ...(user ? [{ href: '/wallet', label: 'My Wallet', icon: <FiDollarSign /> }] : []),
         ...(user ? [{ href: '/profile', label: 'My Profile', icon: <FiUser /> }] : []),
     ];
+    const noSidebarRoutes = ['/login', '/register', '/admin-login'];
+    const isAuthPage = noSidebarRoutes.includes(router.pathname);
+
+    // Auth pages: sirf Navbar + fullscreen content, no sidebar/footer
+    if (isAuthPage) {
+        return (
+            <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', background: '#0a0818' }}>
+                <Navbar />
+                <div style={{ flex: 1 }}>
+                    {children}
+                </div>
+            </div>
+        );
+    }
+
 
     return (
         <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', background: '#0a0818' }}>
