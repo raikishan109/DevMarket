@@ -264,7 +264,7 @@ export default function Home() {
                             {stats.map((s, i) => (
                                 <div key={i} style={{ textAlign: 'center' }}>
                                     <div style={{ fontSize: 'clamp(24px, 3vw, 36px)', fontWeight: 800, color: 'white', letterSpacing: '-1px' }}>{s.value}</div>
-                                    <div style={{ fontSize: 13, color: '#64748b', fontWeight: 500, marginTop: 4 }}>{s.label}</div>
+                                    <div style={{ fontSize: 13, color: '#818cf8', fontWeight: 500, marginTop: 4 }}>{s.label}</div>
                                 </div>
                             ))}
                         </div>
@@ -277,19 +277,19 @@ export default function Home() {
                 </section>
 
                 {/* ── CATEGORIES ── */}
-                <section style={{ padding: '100px 6%', background: '#f8fafc' }}>
+                <section style={{ padding: '100px 6%', background: '#0a0818' }}>
                     <div style={{ maxWidth: 1200, margin: '0 auto' }}>
                         <div style={{ textAlign: 'center', marginBottom: 64 }}>
                             <span style={{
                                 display: 'inline-block', padding: '6px 16px', borderRadius: 100,
-                                background: 'rgba(99,102,241,0.1)', color: '#6366f1',
+                                background: 'rgba(99,102,241,0.15)', color: '#a5b4fc',
                                 fontSize: 13, fontWeight: 700, marginBottom: 16, letterSpacing: '0.5px',
-                                textTransform: 'uppercase',
+                                textTransform: 'uppercase', border: '1px solid rgba(99,102,241,0.25)',
                             }}>Categories</span>
-                            <h2 style={{ fontSize: 'clamp(28px, 4vw, 48px)', fontWeight: 800, color: '#0f172a', letterSpacing: '-1px', marginBottom: 12 }}>
+                            <h2 style={{ fontSize: 'clamp(28px, 4vw, 48px)', fontWeight: 800, color: 'white', letterSpacing: '-1px', marginBottom: 12 }}>
                                 Everything You Need to Build
                             </h2>
-                            <p style={{ fontSize: 18, color: '#64748b', maxWidth: 500, margin: '0 auto' }}>
+                            <p style={{ fontSize: 18, color: '#94a3b8', maxWidth: 500, margin: '0 auto' }}>
                                 From AI tools to mobile apps — find it all in one marketplace.
                             </p>
                         </div>
@@ -299,19 +299,20 @@ export default function Home() {
                                 <Link key={i} href="/marketplace" style={{ textDecoration: 'none' }}>
                                     <div
                                         style={{
-                                            background: 'white', borderRadius: 20, padding: 32,
-                                            border: '1px solid #e2e8f0', cursor: 'pointer',
+                                            background: 'rgba(255,255,255,0.04)', borderRadius: 20, padding: 32,
+                                            border: '1px solid rgba(99,102,241,0.15)', cursor: 'pointer',
                                             transition: 'all 0.3s ease', position: 'relative', overflow: 'hidden',
+                                            backdropFilter: 'blur(10px)',
                                         }}
                                         onMouseEnter={e => {
                                             e.currentTarget.style.transform = 'translateY(-6px)';
-                                            e.currentTarget.style.boxShadow = '0 20px 60px rgba(0,0,0,0.12)';
-                                            e.currentTarget.style.borderColor = 'transparent';
+                                            e.currentTarget.style.boxShadow = '0 20px 60px rgba(99,102,241,0.2)';
+                                            e.currentTarget.style.borderColor = 'rgba(99,102,241,0.4)';
                                         }}
                                         onMouseLeave={e => {
                                             e.currentTarget.style.transform = 'translateY(0)';
                                             e.currentTarget.style.boxShadow = 'none';
-                                            e.currentTarget.style.borderColor = '#e2e8f0';
+                                            e.currentTarget.style.borderColor = 'rgba(99,102,241,0.15)';
                                         }}
                                     >
                                         <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 20 }}>
@@ -325,13 +326,14 @@ export default function Home() {
                                                 {cat.icon}
                                             </div>
                                             <span style={{
-                                                background: '#f1f5f9', color: '#475569',
-                                                borderRadius: 8, padding: '4px 12px', fontSize: 13, fontWeight: 600
+                                                background: 'rgba(99,102,241,0.15)', color: '#a5b4fc',
+                                                borderRadius: 8, padding: '4px 12px', fontSize: 13, fontWeight: 600,
+                                                border: '1px solid rgba(99,102,241,0.25)',
                                             }}>{cat.count}</span>
                                         </div>
-                                        <h3 style={{ fontSize: 20, fontWeight: 700, color: '#0f172a', marginBottom: 8 }}>{cat.name}</h3>
-                                        <p style={{ fontSize: 14, color: '#64748b', lineHeight: 1.6 }}>{cat.description}</p>
-                                        <div style={{ marginTop: 20, display: 'flex', alignItems: 'center', gap: 6, color: '#6366f1', fontWeight: 600, fontSize: 14 }}>
+                                        <h3 style={{ fontSize: 20, fontWeight: 700, color: 'white', marginBottom: 8 }}>{cat.name}</h3>
+                                        <p style={{ fontSize: 14, color: '#94a3b8', lineHeight: 1.6 }}>{cat.description}</p>
+                                        <div style={{ marginTop: 20, display: 'flex', alignItems: 'center', gap: 6, color: '#818cf8', fontWeight: 600, fontSize: 14 }}>
                                             <span>Explore</span> <FiArrowRight size={14} />
                                         </div>
                                     </div>
@@ -342,16 +344,16 @@ export default function Home() {
                 </section>
 
                 {/* ── HOW IT WORKS ── */}
-                <section style={{ padding: '100px 6%', background: 'white' }}>
+                <section style={{ padding: '100px 6%', background: 'linear-gradient(135deg, #0f0c29 0%, #1a1040 100%)' }}>
                     <div style={{ maxWidth: 1200, margin: '0 auto' }}>
                         <div style={{ textAlign: 'center', marginBottom: 64 }}>
                             <span style={{
                                 display: 'inline-block', padding: '6px 16px', borderRadius: 100,
-                                background: 'rgba(139,92,246,0.1)', color: '#8b5cf6',
+                                background: 'rgba(139,92,246,0.15)', color: '#c4b5fd',
                                 fontSize: 13, fontWeight: 700, marginBottom: 16, letterSpacing: '0.5px',
-                                textTransform: 'uppercase',
+                                textTransform: 'uppercase', border: '1px solid rgba(139,92,246,0.3)',
                             }}>How It Works</span>
-                            <h2 style={{ fontSize: 'clamp(28px, 4vw, 48px)', fontWeight: 800, color: '#0f172a', letterSpacing: '-1px', marginBottom: 12 }}>
+                            <h2 style={{ fontSize: 'clamp(28px, 4vw, 48px)', fontWeight: 800, color: 'white', letterSpacing: '-1px', marginBottom: 12 }}>
                                 Start in 3 Simple Steps
                             </h2>
                         </div>
@@ -378,8 +380,8 @@ export default function Home() {
                                             fontSize: 11, fontWeight: 800, display: 'flex', alignItems: 'center', justifyContent: 'center',
                                         }}>{i + 1}</div>
                                     </div>
-                                    <h3 style={{ fontSize: 22, fontWeight: 700, color: '#0f172a', marginBottom: 12 }}>{item.title}</h3>
-                                    <p style={{ fontSize: 15, color: '#64748b', lineHeight: 1.7 }}>{item.desc}</p>
+                                    <h3 style={{ fontSize: 22, fontWeight: 700, color: 'white', marginBottom: 12 }}>{item.title}</h3>
+                                    <p style={{ fontSize: 15, color: '#94a3b8', lineHeight: 1.7 }}>{item.desc}</p>
                                 </div>
                             ))}
                         </div>
@@ -429,15 +431,15 @@ export default function Home() {
                 </section>
 
                 {/* ── TESTIMONIALS ── */}
-                <section style={{ padding: '100px 6%', background: '#f8fafc' }}>
+                <section style={{ padding: '100px 6%', background: '#0a0818' }}>
                     <div style={{ maxWidth: 800, margin: '0 auto', textAlign: 'center' }}>
                         <span style={{
                             display: 'inline-block', padding: '6px 16px', borderRadius: 100,
-                            background: 'rgba(251,191,36,0.1)', color: '#d97706',
+                            background: 'rgba(251,191,36,0.15)', color: '#fbbf24',
                             fontSize: 13, fontWeight: 700, marginBottom: 16, letterSpacing: '0.5px',
-                            textTransform: 'uppercase',
+                            textTransform: 'uppercase', border: '1px solid rgba(251,191,36,0.3)',
                         }}>Testimonials</span>
-                        <h2 style={{ fontSize: 'clamp(28px, 4vw, 44px)', fontWeight: 800, color: '#0f172a', letterSpacing: '-1px', marginBottom: 48 }}>
+                        <h2 style={{ fontSize: 'clamp(28px, 4vw, 44px)', fontWeight: 800, color: 'white', letterSpacing: '-1px', marginBottom: 48 }}>
                             Loved by Developers
                         </h2>
 
@@ -450,16 +452,17 @@ export default function Home() {
                                     transform: i === activeTestimonial ? 'translateY(0)' : 'translateY(20px)',
                                     transition: 'all 0.5s ease',
                                     pointerEvents: i === activeTestimonial ? 'auto' : 'none',
-                                    background: 'white', borderRadius: 24, padding: '40px 48px',
-                                    boxShadow: '0 4px 40px rgba(0,0,0,0.08)',
-                                    border: '1px solid #e2e8f0',
+                                    background: 'rgba(255,255,255,0.04)', borderRadius: 24, padding: '40px 48px',
+                                    boxShadow: '0 4px 40px rgba(99,102,241,0.15)',
+                                    border: '1px solid rgba(99,102,241,0.2)',
+                                    backdropFilter: 'blur(10px)',
                                 }}>
                                     <div style={{ display: 'flex', justifyContent: 'center', gap: 4, marginBottom: 20 }}>
                                         {[...Array(t.stars)].map((_, j) => (
                                             <FiStar key={j} size={18} fill="#f59e0b" color="#f59e0b" />
                                         ))}
                                     </div>
-                                    <p style={{ fontSize: 20, color: '#334155', lineHeight: 1.7, fontStyle: 'italic', marginBottom: 28 }}>
+                                    <p style={{ fontSize: 20, color: '#e2e8f0', lineHeight: 1.7, fontStyle: 'italic', marginBottom: 28 }}>
                                         "{t.text}"
                                     </p>
                                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 14 }}>
@@ -470,8 +473,8 @@ export default function Home() {
                                             display: 'flex', alignItems: 'center', justifyContent: 'center',
                                         }}>{t.avatar}</div>
                                         <div style={{ textAlign: 'left' }}>
-                                            <div style={{ fontWeight: 700, color: '#0f172a', fontSize: 15 }}>{t.name}</div>
-                                            <div style={{ color: '#64748b', fontSize: 13 }}>{t.role}</div>
+                                            <div style={{ fontWeight: 700, color: 'white', fontSize: 15 }}>{t.name}</div>
+                                            <div style={{ color: '#94a3b8', fontSize: 13 }}>{t.role}</div>
                                         </div>
                                     </div>
                                 </div>
@@ -482,7 +485,7 @@ export default function Home() {
                             {testimonials.map((_, i) => (
                                 <button key={i} onClick={() => setActiveTestimonial(i)} style={{
                                     width: i === activeTestimonial ? 28 : 8, height: 8, borderRadius: 100, border: 'none', cursor: 'pointer',
-                                    background: i === activeTestimonial ? '#6366f1' : '#cbd5e1',
+                                    background: i === activeTestimonial ? '#6366f1' : '#334155',
                                     transition: 'all 0.3s ease', padding: 0,
                                 }} />
                             ))}
