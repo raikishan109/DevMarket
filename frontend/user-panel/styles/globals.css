@@ -4,9 +4,59 @@
 
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
 
+/* ─── THEME VARIABLES ─── */
+:root,
+[data-theme="dark"] {
+  --bg-page:      #0a0818;
+  --bg-nav:       rgba(15,10,40,0.95);
+  --bg-nav-blur:  rgba(15,10,40,0.8);
+  --bg-sidebar:   rgba(15,10,40,0.95);
+  --bg-card:      rgba(15,10,40,0.6);
+  --bg-main:      #0a0818;
+  --bg-inner:     rgba(13,13,20,0.97);
+  --border-color: rgba(99,102,241,0.15);
+  --text-primary: #f1f5f9;
+  --text-muted:   #94a3b8;
+  --text-sub:     #64748b;
+  --accent:       #818cf8;
+  --accent-hover: #a5b4fc;
+  --link-active-bg: rgba(99,102,241,0.2);
+  --link-active-color: #a5b4fc;
+  --link-color:   #94a3b8;
+  --scrollbar-track: #0f172a;
+  --scrollbar-thumb: #4f46e5;
+}
+
+[data-theme="light"] {
+  --bg-page:      #f5f5ff;
+  --bg-nav:       rgba(255,255,255,0.96);
+  --bg-nav-blur:  rgba(255,255,255,0.92);
+  --bg-sidebar:   rgba(245,245,255,0.98);
+  --bg-card:      rgba(255,255,255,0.85);
+  --bg-main:      #f0f0fa;
+  --bg-inner:     #ffffff;
+  --border-color: rgba(99,102,241,0.18);
+  --text-primary: #1e1b4b;
+  --text-muted:   #4b5563;
+  --text-sub:     #6b7280;
+  --accent:       #6366f1;
+  --accent-hover: #4f46e5;
+  --link-active-bg: rgba(99,102,241,0.1);
+  --link-active-color: #4338ca;
+  --link-color:   #4b5563;
+  --scrollbar-track: #e0e7ff;
+  --scrollbar-thumb: #6366f1;
+}
+
+/* ─── SMOOTH TRANSITION on theme switch ─── */
+*, *::before, *::after {
+  transition: background-color 0.25s ease, color 0.2s ease, border-color 0.2s ease;
+}
+
 @layer base {
   body {
-    @apply bg-slate-950 text-gray-100;
+    background-color: var(--bg-page);
+    color: var(--text-primary);
     font-family: 'Inter', sans-serif;
   }
 
@@ -19,17 +69,7 @@
   input,
   textarea,
   [contenteditable],
-  p,
-  h1,
-  h2,
-  h3,
-  h4,
-  h5,
-  h6,
-  span,
-  li,
-  td,
-  th {
+  p, h1, h2, h3, h4, h5, h6, span, li, td, th {
     -webkit-user-select: text;
     -moz-user-select: text;
     user-select: text;
@@ -49,6 +89,10 @@
     @apply bg-white/10 backdrop-blur text-white border border-white/20 hover:bg-white/20;
   }
 
+  [data-theme="light"] .btn-secondary {
+    @apply bg-indigo-50 text-indigo-700 border border-indigo-200 hover:bg-indigo-100;
+  }
+
   .btn-danger {
     @apply bg-rose-600 text-white hover:bg-rose-700 shadow-lg hover:shadow-xl;
   }
@@ -62,7 +106,13 @@
   }
 
   .card {
-    @apply bg-slate-900 rounded-2xl shadow-xl border border-slate-800 p-6 transition-all duration-300;
+    background: var(--bg-inner);
+    border: 1px solid var(--border-color);
+    @apply rounded-2xl shadow-xl p-6 transition-all duration-300;
+  }
+
+  [data-theme="light"] .card {
+    box-shadow: 0 4px 20px rgba(99,102,241,0.08);
   }
 
   .card-hover {
@@ -70,11 +120,20 @@
   }
 
   .input {
-    @apply w-full px-4 py-3 bg-slate-800 border border-slate-700 rounded-xl text-gray-100 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all;
+    width: 100%;
+    background: var(--bg-inner);
+    border: 1px solid var(--border-color);
+    color: var(--text-primary);
+    @apply px-4 py-3 rounded-xl placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all;
+  }
+
+  [data-theme="light"] .input {
+    @apply placeholder-gray-400;
   }
 
   .label {
-    @apply block text-sm font-semibold text-gray-300 mb-2;
+    color: var(--text-muted);
+    @apply block text-sm font-semibold mb-2;
   }
 
   .badge {
@@ -82,149 +141,92 @@
   }
 
   .badge-success {
-    @apply bg-emerald-500/20 text-emerald-400 border border-emerald-500/30;
+    @apply bg-emerald-500/20 text-emerald-600 border border-emerald-500/30;
   }
 
   .badge-warning {
-    @apply bg-amber-500/20 text-amber-400 border border-amber-500/30;
+    @apply bg-amber-500/20 text-amber-600 border border-amber-500/30;
   }
 
   .badge-danger {
-    @apply bg-rose-500/20 text-rose-400 border border-rose-500/30;
+    @apply bg-rose-500/20 text-rose-600 border border-rose-500/30;
   }
 
   .badge-info {
-    @apply bg-indigo-500/20 text-indigo-400 border border-indigo-500/30;
+    @apply bg-indigo-500/20 text-indigo-600 border border-indigo-500/30;
   }
 
-  /* Glass card */
   .glass {
-    @apply bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl;
+    background: var(--bg-card);
+    @apply backdrop-blur-xl border rounded-2xl;
+    border-color: var(--border-color);
   }
 
-  /* Section heading */
   .section-tag {
-    @apply inline-block px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-widest bg-indigo-500/15 text-indigo-400 border border-indigo-500/25 mb-4;
+    @apply inline-block px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-widest bg-indigo-500/15 text-indigo-500 border border-indigo-500/25 mb-4;
   }
 }
 
-/* Custom scrollbar */
-::-webkit-scrollbar {
-  width: 6px;
-}
+/* ─── Scrollbar ─── */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--scrollbar-track); }
+::-webkit-scrollbar-thumb { background: var(--scrollbar-thumb); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: #6366f1; }
 
-::-webkit-scrollbar-track {
-  background: #0f172a;
-}
-
-::-webkit-scrollbar-thumb {
-  background: #4f46e5;
-  border-radius: 3px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: #6366f1;
-}
-
-/* Animations */
+/* ─── Animations ─── */
 @keyframes shimmer {
-  0% {
-    background-position: -1000px 0;
-  }
-
-  100% {
-    background-position: 1000px 0;
-  }
+  0%   { background-position: -1000px 0; }
+  100% { background-position:  1000px 0; }
 }
 
 @keyframes fadeIn {
-  from {
-    opacity: 0;
-  }
-
-  to {
-    opacity: 1;
-  }
+  from { opacity: 0; }
+  to   { opacity: 1; }
 }
 
 @keyframes slideUp {
-  from {
-    transform: translateY(20px);
-    opacity: 0;
-  }
-
-  to {
-    transform: translateY(0);
-    opacity: 1;
-  }
+  from { transform: translateY(20px); opacity: 0; }
+  to   { transform: translateY(0);    opacity: 1; }
 }
 
 @keyframes slideIn {
-  from {
-    transform: translateX(100%);
-    opacity: 0;
-  }
-
-  to {
-    transform: translateX(0);
-    opacity: 1;
-  }
+  from { transform: translateX(100%); opacity: 0; }
+  to   { transform: translateX(0);    opacity: 1; }
 }
 
 @keyframes scaleIn {
-  from {
-    transform: scale(0.9);
-    opacity: 0;
-  }
-
-  to {
-    transform: scale(1);
-    opacity: 1;
-  }
+  from { transform: scale(0.9); opacity: 0; }
+  to   { transform: scale(1);   opacity: 1; }
 }
 
 @keyframes pulse-glow {
+  0%, 100% { box-shadow: 0 0 20px rgba(99,102,241,0.3); }
+  50%       { box-shadow: 0 0 40px rgba(99,102,241,0.6); }
+}
 
-  0%,
-  100% {
-    box-shadow: 0 0 20px rgba(99, 102, 241, 0.3);
-  }
-
-  50% {
-    box-shadow: 0 0 40px rgba(99, 102, 241, 0.6);
-  }
+@keyframes themeSpin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
 }
 
 .skeleton {
   animation: shimmer 2s infinite;
-  background: linear-gradient(to right, #1e293b 4%, #334155 25%, #1e293b 36%);
+  background: linear-gradient(to right, rgba(99,102,241,0.06) 4%, rgba(99,102,241,0.12) 25%, rgba(99,102,241,0.06) 36%);
   background-size: 1000px 100%;
 }
 
-.animate-fadeIn {
-  animation: fadeIn 0.2s ease-out;
+.animate-fadeIn    { animation: fadeIn    0.2s ease-out; }
+.animate-slideUp   { animation: slideUp   0.3s ease-out; }
+.animate-slideIn   { animation: slideIn   0.3s ease-out; }
+.animate-scaleIn   { animation: scaleIn   0.2s ease-out; }
+.animate-fade-in   { animation: fadeIn    0.5s ease-in-out; }
+.animate-slide-up  { animation: slideUp   0.5s ease-out; }
+.animate-pulse-glow{ animation: pulse-glow 2s ease-in-out infinite; }
+
+/* ─── Light mode overrides for inline-styled pages ─── */
+[data-theme="light"] {
+  color-scheme: light;
 }
 
-.animate-slideUp {
-  animation: slideUp 0.3s ease-out;
-}
-
-.animate-slideIn {
-  animation: slideIn 0.3s ease-out;
-}
-
-.animate-scaleIn {
-  animation: scaleIn 0.2s ease-out;
-}
-
-.animate-fade-in {
-  animation: fadeIn 0.5s ease-in-out;
-}
-
-.animate-slide-up {
-  animation: slideUp 0.5s ease-out;
-}
-
-.animate-pulse-glow {
-  animation: pulse-glow 2s ease-in-out infinite;
-}
+/* Force white bg for select/option in light mode */
+[data-theme="light"] select option { background: white; color: #1e1b4b; }
