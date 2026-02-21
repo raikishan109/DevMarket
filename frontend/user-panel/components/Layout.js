@@ -25,35 +25,62 @@ export default function Layout({ children }) {
     ];
 
     return (
-        <div className="min-h-screen flex flex-col bg-gray-50">
-            {/* Top Navbar */}
+        <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', background: '#0a0818' }}>
             <Navbar />
 
-            {/* Below Navbar: Sidebar + Content */}
-            <div className="flex flex-1 overflow-hidden">
+            <div style={{ display: 'flex', flex: 1, overflow: 'hidden' }}>
 
-                {/* Permanent Left Sidebar - Fixed */}
-                <aside className="hidden md:flex flex-col w-60 bg-white border-r border-sky-100 shadow-sm shrink-0 fixed top-16 left-0 h-[calc(100vh-64px)] overflow-y-auto z-40">
-                    <nav className="py-4 px-3 space-y-1">
-                        {navLinks.map((link) => (
-                            <Link
-                                key={link.href}
-                                href={link.href}
-                                className={`flex items-center space-x-3 px-4 py-3 rounded-xl font-medium transition-all ${router.pathname === link.href
-                                    ? 'bg-primary-100 text-primary-700 border-l-4 border-primary-500'
-                                    : 'text-gray-600 hover:bg-primary-50 hover:text-primary-600'
-                                    }`}
-                            >
-                                <span className="text-lg">{link.icon}</span>
-                                <span>{link.label}</span>
-                            </Link>
-                        ))}
+                {/* Sidebar */}
+                <aside style={{
+                    width: 240, flexShrink: 0,
+                    background: 'rgba(15,10,40,0.95)',
+                    borderRight: '1px solid rgba(99,102,241,0.12)',
+                    position: 'fixed', top: 64, left: 0,
+                    height: 'calc(100vh - 64px)',
+                    overflowY: 'auto', zIndex: 40,
+                    display: 'flex', flexDirection: 'column',
+                }}>
+                    <nav style={{ padding: '16px 12px', display: 'flex', flexDirection: 'column', gap: 4 }}>
+                        {navLinks.map((link) => {
+                            const active = router.pathname === link.href;
+                            return (
+                                <Link key={link.href} href={link.href} style={{
+                                    display: 'flex', alignItems: 'center', gap: 12,
+                                    padding: '11px 14px', borderRadius: 12,
+                                    fontWeight: 600, fontSize: 14,
+                                    textDecoration: 'none',
+                                    transition: 'all 0.2s ease',
+                                    background: active ? 'rgba(99,102,241,0.2)' : 'transparent',
+                                    color: active ? '#a5b4fc' : '#94a3b8',
+                                    borderLeft: active ? '3px solid #6366f1' : '3px solid transparent',
+                                }}
+                                    onMouseEnter={e => { if (!active) { e.currentTarget.style.background = 'rgba(99,102,241,0.08)'; e.currentTarget.style.color = '#c7d2fe'; } }}
+                                    onMouseLeave={e => { if (!active) { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = '#94a3b8'; } }}
+                                >
+                                    <span style={{ fontSize: 18 }}>{link.icon}</span>
+                                    <span>{link.label}</span>
+                                </Link>
+                            );
+                        })}
                     </nav>
                 </aside>
 
-                {/* Main Content - offset by sidebar width */}
-                <main className="flex-1 md:ml-60 overflow-auto h-[calc(100vh-64px)] p-4 md:p-6">
-                    <div className="bg-white rounded-2xl shadow-sm min-h-full overflow-hidden">
+                {/* Main Content */}
+                <main style={{
+                    flex: 1, marginLeft: 240,
+                    height: 'calc(100vh - 64px)',
+                    overflowY: 'auto',
+                    padding: '24px',
+                    background: '#0a0818',
+                }}>
+                    <div style={{
+                        background: 'rgba(15,10,40,0.6)',
+                        backdropFilter: 'blur(10px)',
+                        borderRadius: 20,
+                        border: '1px solid rgba(99,102,241,0.1)',
+                        minHeight: '100%',
+                        overflow: 'hidden',
+                    }}>
                         {children}
                     </div>
                 </main>

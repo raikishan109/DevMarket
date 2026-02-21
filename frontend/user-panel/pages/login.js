@@ -5,47 +5,26 @@ import Link from 'next/link';
 import Layout from '../components/Layout';
 import api from '../utils/api';
 import { setAuth } from '../utils/auth';
-import { FiMail, FiLock, FiArrowRight } from 'react-icons/fi';
+import { FiMail, FiLock, FiArrowRight, FiCode } from 'react-icons/fi';
 
 export default function Login() {
     const router = useRouter();
-    const [formData, setFormData] = useState({
-        email: '',
-        password: ''
-    });
+    const [formData, setFormData] = useState({ email: '', password: '' });
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
 
-    const handleChange = (e) => {
-        setFormData({
-            ...formData,
-            [e.target.name]: e.target.value
-        });
-    };
+    const handleChange = e => setFormData({ ...formData, [e.target.name]: e.target.value });
 
-    const handleSubmit = async (e) => {
+    const handleSubmit = async e => {
         e.preventDefault();
         setError('');
-
-        if (!formData.email || !formData.password) {
-            setError('Please fill in all fields');
-            return;
-        }
-
+        if (!formData.email || !formData.password) return setError('Please fill in all fields');
         setLoading(true);
-
         try {
             const response = await api.post('/api/auth/login', formData);
-
             if (response.data.success) {
                 setAuth(response.data.token, response.data.user);
-
-                // Redirect based on role
-                if (response.data.user.role === 'developer') {
-                    router.push('/developer/dashboard');
-                } else {
-                    router.push('/marketplace');
-                }
+                router.push(response.data.user.role === 'developer' ? '/developer/dashboard' : '/marketplace');
             }
         } catch (err) {
             setError(err.response?.data?.message || 'Login failed');
@@ -56,124 +35,124 @@ export default function Login() {
 
     return (
         <Layout>
-            <Head>
-                <title>Login - DevMarket</title>
-            </Head>
+            <Head><title>Login - DevMarket</title></Head>
 
-            <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 py-12 px-4 sm:px-6 lg:px-8 flex items-center">
-                <div className="max-w-md mx-auto w-full">
+            <div style={{
+                minHeight: '100vh',
+                background: 'linear-gradient(135deg, #0f0c29 0%, #1a1040 50%, #0f172a 100%)',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                padding: '40px 16px',
+                position: 'relative', overflow: 'hidden',
+            }}>
+                {/* Glow orbs */}
+                <div style={{ position: 'absolute', top: '20%', left: '15%', width: 350, height: 350, borderRadius: '50%', background: 'radial-gradient(circle, rgba(99,102,241,0.15) 0%, transparent 70%)', pointerEvents: 'none' }} />
+                <div style={{ position: 'absolute', bottom: '20%', right: '15%', width: 300, height: 300, borderRadius: '50%', background: 'radial-gradient(circle, rgba(139,92,246,0.15) 0%, transparent 70%)', pointerEvents: 'none' }} />
+
+                <div style={{ position: 'relative', width: '100%', maxWidth: 440 }}>
                     {/* Header */}
-                    <div className="text-center mb-8 animate-fade-in">
-                        <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-primary-600 to-primary-700 rounded-2xl mb-4 shadow-lg">
-                            <FiLock className="text-white text-2xl" />
+                    <div style={{ textAlign: 'center', marginBottom: 32 }}>
+                        <div style={{
+                            width: 64, height: 64, borderRadius: 18, margin: '0 auto 20px',
+                            background: 'linear-gradient(135deg, #6366f1, #8b5cf6)',
+                            display: 'flex', alignItems: 'center', justifyContent: 'center',
+                            boxShadow: '0 8px 30px rgba(99,102,241,0.5)',
+                        }}>
+                            <FiCode color="white" size={28} />
                         </div>
-                        <h2 className="text-4xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent mb-2">
+                        <h2 style={{ fontSize: 32, fontWeight: 800, color: 'white', marginBottom: 8, letterSpacing: '-0.5px' }}>
                             Welcome Back
                         </h2>
-                        <p className="text-gray-600">Sign in to continue to DevMarket</p>
+                        <p style={{ color: '#64748b', fontSize: 15 }}>Sign in to continue to DevMarket</p>
                     </div>
 
-                    {/* Login Card */}
-                    <div className="bg-white rounded-2xl shadow-xl p-8 animate-slide-up border border-gray-100">
+                    {/* Card */}
+                    <div style={{
+                        background: 'rgba(255,255,255,0.04)', backdropFilter: 'blur(20px)',
+                        border: '1px solid rgba(99,102,241,0.2)', borderRadius: 24, padding: 36,
+                    }}>
                         {error && (
-                            <div className="bg-red-50 border-l-4 border-red-500 text-red-700 px-4 py-3 rounded-lg mb-6 flex items-start">
-                                <svg className="w-5 h-5 mr-2 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
-                                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
-                                </svg>
-                                <span>{error}</span>
+                            <div style={{
+                                background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.3)',
+                                borderLeft: '4px solid #ef4444', borderRadius: 12, padding: '12px 16px',
+                                color: '#f87171', marginBottom: 24, fontSize: 14,
+                            }}>
+                                {error}
                             </div>
                         )}
 
-                        <form onSubmit={handleSubmit} className="space-y-6">
-                            {/* Email */}
+                        <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
                             <div>
-                                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                                <label style={{ display: 'block', fontSize: 13, fontWeight: 700, color: '#a5b4fc', marginBottom: 8, textTransform: 'uppercase', letterSpacing: '0.5px' }}>
                                     Email Address
                                 </label>
-                                <div className="relative">
-                                    <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                                        <FiMail className="text-gray-400" />
-                                    </div>
+                                <div style={{ position: 'relative' }}>
+                                    <FiMail style={{ position: 'absolute', left: 16, top: '50%', transform: 'translateY(-50%)', color: '#6366f1' }} />
                                     <input
-                                        type="email"
-                                        name="email"
-                                        value={formData.email}
-                                        onChange={handleChange}
-                                        className="w-full pl-11 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200 bg-gray-50 focus:bg-white"
-                                        placeholder="john@example.com"
-                                        required
+                                        type="email" name="email" value={formData.email} onChange={handleChange}
+                                        placeholder="john@example.com" required
+                                        style={{
+                                            width: '100%', paddingLeft: 44, paddingRight: 16, paddingTop: 13, paddingBottom: 13,
+                                            background: 'rgba(99,102,241,0.08)', border: '1px solid rgba(99,102,241,0.2)',
+                                            borderRadius: 12, color: 'white', fontSize: 15, outline: 'none',
+                                            boxSizing: 'border-box', transition: 'all 0.2s',
+                                        }}
+                                        onFocus={e => e.target.style.borderColor = '#6366f1'}
+                                        onBlur={e => e.target.style.borderColor = 'rgba(99,102,241,0.2)'}
                                     />
                                 </div>
                             </div>
 
-                            {/* Password */}
                             <div>
-                                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                                <label style={{ display: 'block', fontSize: 13, fontWeight: 700, color: '#a5b4fc', marginBottom: 8, textTransform: 'uppercase', letterSpacing: '0.5px' }}>
                                     Password
                                 </label>
-                                <div className="relative">
-                                    <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                                        <FiLock className="text-gray-400" />
-                                    </div>
+                                <div style={{ position: 'relative' }}>
+                                    <FiLock style={{ position: 'absolute', left: 16, top: '50%', transform: 'translateY(-50%)', color: '#6366f1' }} />
                                     <input
-                                        type="password"
-                                        name="password"
-                                        value={formData.password}
-                                        onChange={handleChange}
-                                        className="w-full pl-11 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200 bg-gray-50 focus:bg-white"
-                                        placeholder="••••••••"
-                                        required
+                                        type="password" name="password" value={formData.password} onChange={handleChange}
+                                        placeholder="••••••••" required
+                                        style={{
+                                            width: '100%', paddingLeft: 44, paddingRight: 16, paddingTop: 13, paddingBottom: 13,
+                                            background: 'rgba(99,102,241,0.08)', border: '1px solid rgba(99,102,241,0.2)',
+                                            borderRadius: 12, color: 'white', fontSize: 15, outline: 'none',
+                                            boxSizing: 'border-box', transition: 'all 0.2s',
+                                        }}
+                                        onFocus={e => e.target.style.borderColor = '#6366f1'}
+                                        onBlur={e => e.target.style.borderColor = 'rgba(99,102,241,0.2)'}
                                     />
                                 </div>
                             </div>
 
-                            {/* Submit Button */}
-                            <button
-                                type="submit"
-                                disabled={loading}
-                                className="w-full bg-gradient-to-r from-primary-600 to-primary-700 text-white py-3 px-4 rounded-xl font-semibold hover:from-primary-700 hover:to-primary-800 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-xl flex items-center justify-center group"
+                            <button type="submit" disabled={loading} style={{
+                                width: '100%', padding: '14px', borderRadius: 12, border: 'none', cursor: loading ? 'not-allowed' : 'pointer',
+                                background: loading ? '#4338ca' : 'linear-gradient(135deg, #6366f1, #8b5cf6)',
+                                color: 'white', fontWeight: 700, fontSize: 16,
+                                display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+                                boxShadow: '0 8px 25px rgba(99,102,241,0.4)',
+                                transition: 'all 0.3s', opacity: loading ? 0.7 : 1,
+                            }}
+                                onMouseEnter={e => { if (!loading) e.currentTarget.style.transform = 'translateY(-1px)'; }}
+                                onMouseLeave={e => e.currentTarget.style.transform = 'translateY(0)'}
                             >
-                                {loading ? (
-                                    <span>Logging in...</span>
-                                ) : (
-                                    <>
-                                        <span>Sign In</span>
-                                        <FiArrowRight className="ml-2 group-hover:translate-x-1 transition-transform" />
-                                    </>
-                                )}
+                                {loading ? 'Signing in...' : <><span>Sign In</span><FiArrowRight /></>}
                             </button>
                         </form>
 
-                        {/* Divider */}
-                        <div className="relative my-6">
-                            <div className="absolute inset-0 flex items-center">
-                                <div className="w-full border-t border-gray-200"></div>
-                            </div>
-                            <div className="relative flex justify-center text-sm">
-                                <span className="px-4 bg-white text-gray-500">New to DevMarket?</span>
-                            </div>
+                        <div style={{ margin: '24px 0', borderTop: '1px solid rgba(99,102,241,0.15)', paddingTop: 24, textAlign: 'center' }}>
+                            <span style={{ color: '#475569', fontSize: 14 }}>New to DevMarket? </span>
+                            <Link href="/register" style={{ color: '#818cf8', fontWeight: 700, textDecoration: 'none', fontSize: 14 }}>
+                                Create an account →
+                            </Link>
                         </div>
 
-                        {/* Register Link */}
-                        <div className="text-center">
-                            <Link
-                                href="/register"
-                                className="inline-flex items-center text-primary-600 hover:text-primary-700 font-semibold transition-colors"
+                        <div style={{ textAlign: 'center' }}>
+                            <Link href="/admin-login" style={{ color: '#475569', fontSize: 13, textDecoration: 'none' }}
+                                onMouseEnter={e => e.currentTarget.style.color = '#818cf8'}
+                                onMouseLeave={e => e.currentTarget.style.color = '#475569'}
                             >
-                                Create an account
-                                <FiArrowRight className="ml-1" />
+                                Admin Login →
                             </Link>
                         </div>
-                    </div>
-
-                    {/* Footer Links */}
-                    <div className="mt-6 text-center space-y-2">
-                        <p className="text-sm text-gray-600">
-                            Are you an administrator?{' '}
-                            <Link href="/admin-login" className="text-primary-600 hover:text-primary-700 font-semibold">
-                                Admin Login
-                            </Link>
-                        </p>
                     </div>
                 </div>
             </div>

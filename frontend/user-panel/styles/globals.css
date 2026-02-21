@@ -2,31 +2,34 @@
 @tailwind components;
 @tailwind utilities;
 
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+
 @layer base {
   body {
-    @apply bg-gray-50 text-gray-900;
+    @apply bg-slate-950 text-gray-100;
+    font-family: 'Inter', sans-serif;
   }
 }
 
 @layer components {
   .btn {
-    @apply px-6 py-3 rounded-lg font-semibold transition-all duration-300 transform hover:scale-105;
+    @apply px-6 py-3 rounded-xl font-semibold transition-all duration-300 transform hover:scale-105 inline-flex items-center justify-center gap-2;
   }
 
   .btn-primary {
-    @apply bg-gradient-to-r from-primary-600 to-primary-700 text-white hover:from-primary-700 hover:to-primary-800 shadow-lg hover:shadow-xl;
+    @apply bg-gradient-to-r from-indigo-600 to-violet-600 text-white hover:from-indigo-700 hover:to-violet-700 shadow-lg hover:shadow-indigo-500/30 hover:shadow-xl;
   }
 
   .btn-secondary {
-    @apply bg-white text-primary-600 border-2 border-primary-600 hover:bg-primary-50;
+    @apply bg-white/10 backdrop-blur text-white border border-white/20 hover:bg-white/20;
   }
 
   .btn-danger {
-    @apply bg-red-600 text-white hover:bg-red-700 shadow-lg hover:shadow-xl;
+    @apply bg-rose-600 text-white hover:bg-rose-700 shadow-lg hover:shadow-xl;
   }
 
   .btn-success {
-    @apply bg-green-600 text-white hover:bg-green-700 shadow-lg hover:shadow-xl;
+    @apply bg-emerald-600 text-white hover:bg-emerald-700 shadow-lg hover:shadow-xl;
   }
 
   .btn-sm {
@@ -34,15 +37,19 @@
   }
 
   .card {
-    @apply bg-white rounded-xl shadow-md hover:shadow-xl transition-shadow duration-300 p-6 border-2 border-gray-300;
+    @apply bg-slate-900 rounded-2xl shadow-xl border border-slate-800 p-6 transition-all duration-300;
+  }
+
+  .card-hover {
+    @apply hover:border-indigo-500/50 hover:shadow-indigo-500/10 hover:shadow-2xl;
   }
 
   .input {
-    @apply w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all;
+    @apply w-full px-4 py-3 bg-slate-800 border border-slate-700 rounded-xl text-gray-100 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all;
   }
 
   .label {
-    @apply block text-sm font-semibold text-gray-700 mb-2;
+    @apply block text-sm font-semibold text-gray-300 mb-2;
   }
 
   .badge {
@@ -50,38 +57,48 @@
   }
 
   .badge-success {
-    @apply bg-green-100 text-green-800;
+    @apply bg-emerald-500/20 text-emerald-400 border border-emerald-500/30;
   }
 
   .badge-warning {
-    @apply bg-yellow-100 text-yellow-800;
+    @apply bg-amber-500/20 text-amber-400 border border-amber-500/30;
   }
 
   .badge-danger {
-    @apply bg-red-100 text-red-800;
+    @apply bg-rose-500/20 text-rose-400 border border-rose-500/30;
   }
 
   .badge-info {
-    @apply bg-blue-100 text-blue-800;
+    @apply bg-indigo-500/20 text-indigo-400 border border-indigo-500/30;
+  }
+
+  /* Glass card */
+  .glass {
+    @apply bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl;
+  }
+
+  /* Section heading */
+  .section-tag {
+    @apply inline-block px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-widest bg-indigo-500/15 text-indigo-400 border border-indigo-500/25 mb-4;
   }
 }
 
 /* Custom scrollbar */
 ::-webkit-scrollbar {
-  width: 8px;
+  width: 6px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #f1f1f1;
+  background: #0f172a;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #888;
-  border-radius: 4px;
+  background: #4f46e5;
+  border-radius: 3px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #555;
+  background: #6366f1;
 }
 
 /* Animations */
@@ -141,9 +158,21 @@
   }
 }
 
+@keyframes pulse-glow {
+
+  0%,
+  100% {
+    box-shadow: 0 0 20px rgba(99, 102, 241, 0.3);
+  }
+
+  50% {
+    box-shadow: 0 0 40px rgba(99, 102, 241, 0.6);
+  }
+}
+
 .skeleton {
   animation: shimmer 2s infinite;
-  background: linear-gradient(to right, #f0f0f0 4%, #e0e0e0 25%, #f0f0f0 36%);
+  background: linear-gradient(to right, #1e293b 4%, #334155 25%, #1e293b 36%);
   background-size: 1000px 100%;
 }
 
@@ -161,4 +190,16 @@
 
 .animate-scaleIn {
   animation: scaleIn 0.2s ease-out;
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.5s ease-in-out;
+}
+
+.animate-slide-up {
+  animation: slideUp 0.5s ease-out;
+}
+
+.animate-pulse-glow {
+  animation: pulse-glow 2s ease-in-out infinite;
 }

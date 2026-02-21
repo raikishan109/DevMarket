@@ -1,74 +1,65 @@
 import Link from 'next/link';
-import { FiGithub, FiTwitter, FiLinkedin, FiMail } from 'react-icons/fi';
+import { FiCode, FiGithub, FiTwitter, FiLinkedin, FiMail } from 'react-icons/fi';
 
 export default function Footer() {
     return (
-        <footer className="bg-gray-900 text-white mt-20">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-                <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-                    {/* About */}
-                    <div>
-                        <h3 className="text-xl font-bold mb-4">DevMarket</h3>
-                        <p className="text-gray-400 text-sm">
-                            The premier marketplace for developers to sell and buy tools, AI automation, websites, and mobile apps.
-                        </p>
-                    </div>
+        <footer style={{ background: '#0f172a', borderTop: '1px solid rgba(99,102,241,0.15)', color: '#94a3b8', padding: '56px 6% 28px' }}>
+            <div style={{ maxWidth: 1200, margin: '0 auto' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 40, marginBottom: 48 }}>
 
-                    {/* Quick Links */}
                     <div>
-                        <h4 className="text-lg font-semibold mb-4">Quick Links</h4>
-                        <ul className="space-y-2">
-                            <li>
-                                <Link href="/marketplace" className="text-gray-400 hover:text-white transition-colors">
-                                    Marketplace
-                                </Link>
-                            </li>
-                            <li>
-                                <Link href="/register" className="text-gray-400 hover:text-white transition-colors">
-                                    Sell Your Product
-                                </Link>
-                            </li>
-                            <li>
-                                <Link href="/login" className="text-gray-400 hover:text-white transition-colors">
-                                    Login
-                                </Link>
-                            </li>
-                        </ul>
-                    </div>
-
-                    {/* Categories */}
-                    <div>
-                        <h4 className="text-lg font-semibold mb-4">Categories</h4>
-                        <ul className="space-y-2">
-                            <li className="text-gray-400">AI Tools</li>
-                            <li className="text-gray-400">Automation</li>
-                            <li className="text-gray-400">Websites</li>
-                            <li className="text-gray-400">Mobile Apps</li>
-                        </ul>
-                    </div>
-
-                    {/* Contact */}
-                    <div>
-                        <h4 className="text-lg font-semibold mb-4">Connect</h4>
-                        <div className="flex space-x-4">
-                            <a href="#" className="text-gray-400 hover:text-white transition-colors">
-                                <FiGithub size={20} />
-                            </a>
-                            <a href="#" className="text-gray-400 hover:text-white transition-colors">
-                                <FiTwitter size={20} />
-                            </a>
-                            <a href="#" className="text-gray-400 hover:text-white transition-colors">
-                                <FiLinkedin size={20} />
-                            </a>
-                            <a href="#" className="text-gray-400 hover:text-white transition-colors">
-                                <FiMail size={20} />
-                            </a>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 14 }}>
+                            <div style={{
+                                width: 34, height: 34, borderRadius: 8,
+                                background: 'linear-gradient(135deg, #6366f1, #8b5cf6)',
+                                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                            }}>
+                                <FiCode color="white" size={17} />
+                            </div>
+                            <span style={{ fontWeight: 800, fontSize: 17, color: 'white' }}>DevMarket</span>
                         </div>
+                        <p style={{ fontSize: 14, lineHeight: 1.7, maxWidth: 220 }}>
+                            India's premier marketplace for buying and selling developer products.
+                        </p>
+                        <div style={{ display: 'flex', gap: 12, marginTop: 20 }}>
+                            {[FiGithub, FiTwitter, FiLinkedin, FiMail].map((Icon, i) => (
+                                <a key={i} href="#" style={{
+                                    width: 36, height: 36, borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                    background: 'rgba(99,102,241,0.1)', border: '1px solid rgba(99,102,241,0.2)',
+                                    color: '#818cf8', transition: 'all 0.2s',
+                                }}
+                                    onMouseEnter={e => { e.currentTarget.style.background = 'rgba(99,102,241,0.25)'; e.currentTarget.style.color = 'white'; }}
+                                    onMouseLeave={e => { e.currentTarget.style.background = 'rgba(99,102,241,0.1)'; e.currentTarget.style.color = '#818cf8'; }}
+                                >
+                                    <Icon size={16} />
+                                </a>
+                            ))}
+                        </div>
+                    </div>
+
+                    <div>
+                        <div style={{ fontWeight: 700, color: 'white', marginBottom: 16, fontSize: 15 }}>Product</div>
+                        {[['Browse Marketplace', '/marketplace'], ['Sell Your Product', '/register'], ['Login', '/login']].map(([l, h]) => (
+                            <div key={l} style={{ marginBottom: 10 }}>
+                                <Link href={h} style={{ color: '#64748b', textDecoration: 'none', fontSize: 14, transition: 'color 0.2s' }}
+                                    onMouseEnter={e => e.currentTarget.style.color = '#818cf8'}
+                                    onMouseLeave={e => e.currentTarget.style.color = '#64748b'}
+                                >{l}</Link>
+                            </div>
+                        ))}
+                    </div>
+
+                    <div>
+                        <div style={{ fontWeight: 700, color: 'white', marginBottom: 16, fontSize: 15 }}>Categories</div>
+                        {['AI Tools', 'Automation', 'Websites', 'Mobile Apps', 'Scripts & APIs'].map(c => (
+                            <div key={c} style={{ marginBottom: 10, fontSize: 14, color: '#64748b' }}>{c}</div>
+                        ))}
                     </div>
                 </div>
 
-                <div className="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400 text-sm">
-                    <p>&copy; {new Date().getFullYear()} DevMarket. All rights reserved.</p>
+                <div style={{ borderTop: '1px solid #1e293b', paddingTop: 24, display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 12 }}>
+                    <span style={{ fontSize: 13 }}>© {new Date().getFullYear()} DevMarket. All rights reserved.</span>
+                    <span style={{ fontSize: 13 }}>Made with ❤️ for Indian Developers</span>
                 </div>
             </div>
         </footer>
